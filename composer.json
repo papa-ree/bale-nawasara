@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "paparee/bale-nawasara",
+    "description": "Bale for monitoring",
     "keywords": [
-        ":vendor_name",
+        "paparee",
         "laravel",
-        ":package_slug"
+        "bale-nawasara"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/paparee/bale-nawasara",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Papa Ree",
+            "email": "ricky.romdhoni@gmail.com",
             "role": "Developer"
         }
     ],
@@ -35,13 +35,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Paparee\\BaleNawasara\\": "src/",
+            "Paparee\\BaleNawasara\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "Paparee\\BaleNawasara\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +63,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Paparee\\BaleNawasara\\BaleNawasaraServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "BaleNawasara": "Paparee\\BaleNawasara\\Facades\\BaleNawasara"
             }
         }
     },
