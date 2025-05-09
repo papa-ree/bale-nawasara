@@ -2,9 +2,9 @@
 
 namespace Paparee\BaleNawasara;
 
+use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 
 class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
