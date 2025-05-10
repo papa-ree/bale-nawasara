@@ -2,12 +2,41 @@
 
 namespace Paparee\BaleNawasara;
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schedule;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 
 class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
+    public function register()
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/bale-nawasara.php', 'bale-nawasara');
+    }
+
+    public function boot()
+    {
+        $this->app['router']->aliasMiddleware('set-locale', \Paparee\BaleCms\App\Middleware\SetLocale::class);
+
+        // Untuk web routes
+        foreach (glob(__DIR__ . '/../routes/*.php') as $routeFile) {
+            Route::middleware('web')->group($routeFile);
+        }
+
+        // Untuk schedule
+        if ($this->app->runningInConsole()) {
+            $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+                require __DIR__.'/../routes/console.php';
+            });
+        }
+
+        // Config publish
+        $this->publishes([
+            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+        ], 'bale-nawasara-config');
+    }
+
     public function configurePackage(Package $package): void
     {
         /*
