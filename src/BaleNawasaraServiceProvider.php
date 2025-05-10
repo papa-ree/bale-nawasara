@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schedule;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 
 class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
