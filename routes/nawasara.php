@@ -34,7 +34,7 @@ Route::localizedGroup(function () {
                 });
 
                 Route::get('/dns-records', function (Request $request) {
-                    $cf = new CloudflareService();
+                    $cf = new CloudflareService;
                     $allRecords = collect($cf->getDnsRecords()); // Tambahkan ['result'] karena response Cloudflare menyimpan data di `result`
 
                     foreach ($allRecords as $record) {
@@ -58,7 +58,7 @@ Route::localizedGroup(function () {
                             ]
                         );
                     }
-                    
+
                     // dd($allRecords);
                     // SEARCH
                     // if ($request->filled('search')) {
@@ -68,17 +68,17 @@ Route::localizedGroup(function () {
                     //         str_contains(strtolower($record['type']), $search)
                     //     );
                     // }
-                
+
                     // // SORT
                     // if ($request->filled('sortBy')) {
                     //     $allRecords = $allRecords->sortBy($request->sortBy, SORT_REGULAR, $request->sortDirection === 'desc');
                     // }
-                
+
                     // // PAGINATION
                     // $page = (int) $request->input('page', 1);
                     // $perPage = (int) $request->input('perPage', 10);
                     // $paginated = $allRecords->forPage($page, $perPage)->values();
-                
+
                     // return response()->json([
                     //     'data' => $paginated,
                     //     'total' => $allRecords->count(),
@@ -93,9 +93,7 @@ Route::localizedGroup(function () {
                 Route::get('/dns-records/status', [DnsRecordController::class, 'status'])->name('dns.status');
 
             });
-            
 
-            
         });
     });
 });

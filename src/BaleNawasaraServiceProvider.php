@@ -20,7 +20,7 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
         $this->app['router']->aliasMiddleware('set-locale', \Paparee\BaleCms\App\Middleware\SetLocale::class);
 
         // Untuk web routes
-        foreach (glob(__DIR__ . '/../routes/*.php') as $routeFile) {
+        foreach (glob(__DIR__.'/../routes/*.php') as $routeFile) {
             Route::middleware('web')->group($routeFile);
         }
 

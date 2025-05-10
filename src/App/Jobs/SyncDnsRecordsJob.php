@@ -2,13 +2,13 @@
 
 namespace Paparee\BaleNawasara\App\Jobs;
 
-use Paparee\BaleNawasara\App\Services\CloudflareService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
+use Paparee\BaleNawasara\App\Services\CloudflareService;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -16,7 +16,7 @@ class SyncDnsRecordsJob implements ShouldQueue
 
     public function handle(): void
     {
-        $cf = new CloudflareService();
+        $cf = new CloudflareService;
         $response = $cf->getDnsRecords();
 
         $records = collect($response['result'] ?? []);
