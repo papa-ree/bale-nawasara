@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace Paparee\BaleNawasara\App\Services;
 
 use Illuminate\Support\Facades\Cache;
@@ -22,35 +23,36 @@ class CloudflareService
             $allRecords = [];
             $page = 1;
             $perPage = 100;
-    
+
             do {
                 $response = Http::withToken(config('bale-nawasara.cloudflare.api_token'))
-                    ->get("{$this->baseUrl}/zones/" . config('bale-nawasara.cloudflare.zone_id') . "/dns_records", [
+                    ->get("{$this->baseUrl}/zones/".config('bale-nawasara.cloudflare.zone_id').'/dns_records', [
                         'page' => $page,
                         'per_page' => $perPage,
                     ]);
-    
-                if (!$response->successful()) {
+
+                if (! $response->successful()) {
                     // Log error response if needed
                     logger()->error('Cloudflare API error', [
                         'status' => $response->status(),
                         'body' => $response->body(),
                     ]);
+
                     return []; // fail gracefully
                 }
-    
+
                 // dd($response->json());
                 $json = $response->json();
-                
+
                 // Cek apakah key 'result' dan 'result_info' tersedia
                 $records = $json['result'] ?? [];
                 $resultInfo = $json['result_info'] ?? ['total_pages' => 1];
-    
+
                 $allRecords = array_merge($allRecords, $records);
                 $page++;
-    
+
             } while ($page <= ($resultInfo['total_pages'] ?? 1));
-    
+
             return $allRecords;
         });
     }

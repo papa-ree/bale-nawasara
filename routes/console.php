@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Schedule;
 use Paparee\BaleNawasara\App\Jobs\SyncDnsRecordsJob;
 use Spatie\UptimeMonitor\Commands\CheckUptime;
