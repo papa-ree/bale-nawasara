@@ -5,6 +5,7 @@ namespace Paparee\BaleNawasara;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schedule;
 use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
+use Paparee\BaleNawasara\Commands\InstallNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -24,11 +25,18 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             Route::middleware('web')->group($routeFile);
         }
 
+        $this->publishes([
+            __DIR__.'/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
+        ], 'bale-nawasara-migrations');
+
         // Untuk schedule
         if ($this->app->runningInConsole()) {
             $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
                 require __DIR__.'/../routes/console.php';
             });
+            $this->commands([
+                InstallNawasaraCommand::class,
+            ]);
         }
 
         // Config publish

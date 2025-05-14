@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
+use Spatie\UptimeMonitor\Models\Monitor;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -19,7 +20,7 @@ class SyncDnsRecordsJob implements ShouldQueue
         $cf = new CloudflareService();
         $response = $cf->getDnsRecords();
 
-        $records = collect($response['result'] ?? []);
+        $records = collect($response ?? []);
 
         foreach ($records as $record) {
             DnsRecord::updateOrCreate(
@@ -27,7 +28,7 @@ class SyncDnsRecordsJob implements ShouldQueue
                 [
                     'name' => $record['name'] ?? null,
                     'type' => $record['type'] ?? null,
-                    'content' => is_array($record['content']) ? json_encode($record['content']) : $record['content'],
+                    'content' => json_encode($record['content']) ?? null,
                     'proxiable' => $record['proxiable'] ?? null,
                     'proxied' => $record['proxied'] ?? null,
                     'ttl' => $record['ttl'] ?? null,
@@ -41,6 +42,17 @@ class SyncDnsRecordsJob implements ShouldQueue
                     'tags_modified_on' => $record['tags_modified_on'] ?? null,
                 ]
             );
+
+            if ($record['type'] === 'A') {
+                $monitor = Monitor::updateOrCreate(
+                    ['dns_record_id' => $record['id']],
+                    [
+                        'url' => 'https://' . $record['name'],
+                        'look_for_string' => '',
+                        'uptime_check_method' => 'head',
+                        'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
+                    ]);
+            }
         }
 
         cache()->forget('dns_sync_status');
