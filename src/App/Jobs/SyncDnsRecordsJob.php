@@ -8,8 +8,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
-use Spatie\UptimeMonitor\Models\Monitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
+use Spatie\UptimeMonitor\Models\Monitor;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -47,7 +47,7 @@ class SyncDnsRecordsJob implements ShouldQueue
                 $monitor = Monitor::updateOrCreate(
                     ['dns_record_id' => $record['id']],
                     [
-                        'url' => 'https://' . $record['name'],
+                        'url' => 'https://'.$record['name'],
                         'look_for_string' => '',
                         'uptime_check_method' => 'head',
                         'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),

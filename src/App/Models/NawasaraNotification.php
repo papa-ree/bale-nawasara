@@ -8,7 +8,9 @@ use Ramsey\Uuid\Uuid;
 class NawasaraNotification extends Model
 {
     protected $table = 'notifications';
+
     protected $guarded = [];
+
     protected $primaryKey = 'id';
 
     protected static function booted()
