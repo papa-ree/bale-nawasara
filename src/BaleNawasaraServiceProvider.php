@@ -30,6 +30,17 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             __DIR__.'/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
         ], 'bale-nawasara-migrations');
 
+        // Config publish
+        $this->publishes([
+            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
+            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
+        ], 'bale-nawasara-config');
+
+        $this->publishes([
+            __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
+        ], 'bale-nawasara-views');
+
         // Untuk schedule
         if ($this->app->runningInConsole()) {
             $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
