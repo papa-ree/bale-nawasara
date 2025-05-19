@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Spatie\UptimeMonitor\Models\Enums\CertificateStatus;
 use Spatie\UptimeMonitor\Models\Enums\UptimeStatus;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMonitorsTable extends Migration
 {
@@ -17,7 +17,7 @@ class CreateMonitorsTable extends Migration
     {
         Schema::create('monitors', function (Blueprint $table) {
             $table->increments('id');
-
+            
             $table->uuid('dns_record_id');
             $table->string('url')->unique();
 
