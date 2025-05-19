@@ -1,12 +1,12 @@
 {
-    "name": "paparee/bale-nawasara",
+    "name": "papa-ree/bale-nawasara",
     "description": "Bale for monitoring",
     "keywords": [
-        "paparee",
+        "papa-ree",
         "laravel",
         "bale-nawasara"
     ],
-    "homepage": "https://github.com/paparee/bale-nawasara",
+    "homepage": "https://github.com/papa-ree/bale-nawasara",
     "license": "MIT",
     "authors": [
         {
@@ -19,8 +19,10 @@
         "php": "^8.2",
         "spatie/laravel-package-tools": "^1.16",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
-        "paparee/bale-cms": "dev-master",
-        "spatie/laravel-uptime-monitor": "*"
+        "papa-ree/bale-cms": "dev-master",
+        "evilfreelancer/routeros-api-php": "*",
+        "spatie/laravel-uptime-monitor": "*",
+        "laravel/fortify": "*"
     },
     "require-dev": {
         "laravel/pint": "^1.14",

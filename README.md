@@ -1,9 +1,9 @@
 # Bale for monitoring
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/paparee/bale-nawasara.svg?style=flat-square)](https://packagist.org/packages/paparee/bale-nawasara)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/paparee/bale-nawasara/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/paparee/bale-nawasara/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/paparee/bale-nawasara/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/paparee/bale-nawasara/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/paparee/bale-nawasara.svg?style=flat-square)](https://packagist.org/packages/paparee/bale-nawasara)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/papa-ree/bale-nawasara.svg?style=flat-square)](https://packagist.org/packages/papa-ree/bale-nawasara)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/papa-ree/bale-nawasara/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/papa-ree/bale-nawasara/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/papa-ree/bale-nawasara/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/papa-ree/bale-nawasara/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/papa-ree/bale-nawasara.svg?style=flat-square)](https://packagist.org/packages/papa-ree/bale-nawasara)
 
 This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
 
@@ -20,7 +20,7 @@ We highly appreciate you sending us a postcard from your hometown, mentioning wh
 You can install the package via composer:
 
 ```bash
-composer require paparee/bale-nawasara
+composer require papa-ree/bale-nawasara
 ```
 
 You can publish and run the migrations with:
@@ -76,8 +76,8 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Papa Ree](https://github.com/paparee)
-- [All Contributors](../../contributors)
+-   [Papa Ree](https://github.com/papa-ree)
+-   [All Contributors](../../contributors)
 
 ## License
 

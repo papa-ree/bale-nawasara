@@ -5,6 +5,7 @@ namespace Paparee\BaleNawasara;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schedule;
 use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
+use Paparee\BaleNawasara\Commands\CacheMikroTikArp;
 use Paparee\BaleNawasara\Commands\InstallNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -36,12 +37,15 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             });
             $this->commands([
                 InstallNawasaraCommand::class,
+                CacheMikroTikArp::class,
             ]);
         }
 
         // Config publish
         $this->publishes([
             __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
+            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
         ], 'bale-nawasara-config');
     }
 
