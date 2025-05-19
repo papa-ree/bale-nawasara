@@ -3,9 +3,9 @@
 namespace Paparee\BaleNawasara\App\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Routing\Controller;
 
 class WagoController extends Controller
 {
@@ -31,7 +31,7 @@ class WagoController extends Controller
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ])
-                ->post(env('WHATSAPP_GO_URL') .'/send/message', [
+                ->post(env('WHATSAPP_GO_URL').'/send/message', [
                     'phone' => $request->phone,
                     'message' => $request->message,
                     'reply_message_id' => $request->reply_message_id,
@@ -44,7 +44,7 @@ class WagoController extends Controller
                     'results' => [
                         'message_id' => $response['message_id'] ?? '',
                         'status' => $response['status'] ?? '<feature> success ....',
-                    ]
+                    ],
                 ]);
             }
 

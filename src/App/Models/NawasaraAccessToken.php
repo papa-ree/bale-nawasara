@@ -2,9 +2,9 @@
 
 namespace Paparee\BaleNawasara\App\Models;
 
-use Laravel\Sanctum\PersonalAccessToken;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class NawasaraAccessToken extends PersonalAccessToken
 {

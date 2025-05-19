@@ -2,8 +2,6 @@
 
 namespace Paparee\BaleNawasara\App\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use RouterOS\Client;
 use RouterOS\Query;
 
@@ -28,6 +26,7 @@ class MikrotikService
     public function getArpList(): array
     {
         $query = new Query('/ip/arp/print');
+
         return $this->client->query($query)->read();
     }
 }

@@ -33,4 +33,3 @@ class TrackTokenHitDaily
         return $next($request);
     }
 }
-

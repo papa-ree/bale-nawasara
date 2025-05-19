@@ -7,7 +7,7 @@ use Illuminate\Support\Collection;
 
 trait PaginationCollection
 {
-    public function paginate(Collection $items, int $perPage = 10, int $page = null)
+    public function paginate(Collection $items, int $perPage = 10, ?int $page = null)
     {
         $page = $page ?: LengthAwarePaginator::resolveCurrentPage();
         $itemsForCurrentPage = $items->slice(($page - 1) * $perPage, $perPage)->values();
