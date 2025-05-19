@@ -12,7 +12,7 @@ class UptimeCheckRecovered extends NotificationsUptimeCheckRecovered
 {
     public function toSlack($notifiable)
     {
-        $slack = (new SlackMessage())
+        $slack = (new SlackMessage)
             ->success()
             ->attachment(function (SlackAttachment $attachment) {
                 $attachment

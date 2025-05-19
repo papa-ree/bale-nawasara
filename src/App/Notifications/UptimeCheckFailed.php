@@ -12,7 +12,7 @@ class UptimeCheckFailed extends NotificationsUptimeCheckFailed
 {
     public function toSlack($notifiable)
     {
-        $slack = (new SlackMessage())
+        $slack = (new SlackMessage)
             ->error()
             ->attachment(function (SlackAttachment $attachment) {
                 $attachment
