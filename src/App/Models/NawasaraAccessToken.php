@@ -2,6 +2,7 @@
 
 namespace Paparee\BaleNawasara\App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -11,6 +12,8 @@ class NawasaraAccessToken extends PersonalAccessToken
     protected $table = 'personal_access_tokens';
 
     protected $fillable = [
+        'tokenable_type',
+        'tokenable_id',
         'name',
         'token',
         'plain_text_token',
@@ -60,5 +63,25 @@ class NawasaraAccessToken extends PersonalAccessToken
         ]);
 
         return $plainText;
+    }
+
+    public static function createTokenWithPlainText(Model $tokenable, string $name, array $abilities = []): self
+    {
+        $plainText = Str::random(40);
+        $hashedToken = hash('sha256', $plainText);
+
+        $token = static::create([
+            'tokenable_type' => get_class($tokenable),
+            'tokenable_id' => $tokenable->getKey(),
+            'name' => $name,
+            'token' => $hashedToken,
+            'abilities' => $abilities,
+            'plain_text_token' => Crypt::encryptString($plainText),
+        ]);
+
+        // Attach plain text for return (not saved this way)
+        $token->accessToken = $plainText;
+
+        return $token;
     }
 }
