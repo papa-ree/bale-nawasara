@@ -32,7 +32,7 @@ class WagoController extends Controller
                     'Content-Type' => 'application/json',
                 ])
                 ->post(env('WHATSAPP_GO_URL').'/send/message', [
-                    'phone' => $request->phone . '@s.whatsapp.net',
+                    'phone' => $request->phone.'@s.whatsapp.net',
                     'message' => $request->message,
                     'reply_message_id' => $request->reply_message_id,
                 ]);
