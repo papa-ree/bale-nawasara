@@ -5,8 +5,6 @@ namespace Paparee\BaleNawasara;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schedule;
 use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
-use Paparee\BaleNawasara\Commands\CacheMikroTikArp;
-use Paparee\BaleNawasara\Commands\InstallNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -41,15 +39,16 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
         ], 'bale-nawasara-views');
 
+        // command
+        $this->publishes([
+            __DIR__.'/../src/Commands' => app_path('Console/Commands'),
+        ], 'bale-nawasara-commands');
+
         // Untuk schedule
         if ($this->app->runningInConsole()) {
             $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
                 require __DIR__.'/../routes/console.php';
             });
-            $this->commands([
-                InstallNawasaraCommand::class,
-                CacheMikroTikArp::class,
-            ]);
         }
 
         // Config publish
