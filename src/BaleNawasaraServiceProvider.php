@@ -43,6 +43,11 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
         $this->publishes([
             __DIR__.'/../src/Commands' => app_path('Console/Commands'),
         ], 'bale-nawasara-commands');
+        
+        // job
+        $this->publishes([
+            __DIR__.'/../src/App/Jobs' => app_path('Jobs'),
+        ], 'bale-nawasara-jobs');
 
         // Untuk schedule
         if ($this->app->runningInConsole()) {

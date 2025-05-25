@@ -1,6 +1,6 @@
 <?php
 
-namespace Paparee\BaleNawasara\App\Jobs;
+namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
