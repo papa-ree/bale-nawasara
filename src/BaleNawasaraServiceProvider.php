@@ -2,8 +2,6 @@
 
 namespace Paparee\BaleNawasara;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schedule;
 use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
