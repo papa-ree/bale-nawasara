@@ -1,22 +1,34 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Console\Commands;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Console\Command;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
 use Spatie\UptimeMonitor\Models\Monitor;
 
-class SyncDnsRecordsJob implements ShouldQueue
+class SyncDnsRecord extends Command
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'nawasara:sync-dns-record';
 
-    public function handle(): void
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Sync DNS Record from Cloudflare';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
     {
+        $this->info('Start Sync...');
         $cf = new CloudflareService;
         $response = $cf->getDnsRecords();
 
@@ -54,6 +66,8 @@ class SyncDnsRecordsJob implements ShouldQueue
                     ]);
             }
         }
+
+        $this->info('Sync Successfully');
 
         cache()->forget('dns_sync_status');
     }

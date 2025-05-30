@@ -17,13 +17,6 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 
     public function boot()
     {
-        $this->app['router']->aliasMiddleware('set-locale', \Paparee\BaleCms\App\Middleware\SetLocale::class);
-
-        // Untuk web routes
-        foreach (glob(__DIR__.'/../routes/*.php') as $routeFile) {
-            Route::middleware('web')->group($routeFile);
-        }
-
         $this->publishes([
             __DIR__.'/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
         ], 'bale-nawasara-migrations');
@@ -48,13 +41,6 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
         $this->publishes([
             __DIR__.'/../src/App/Jobs' => app_path('Jobs'),
         ], 'bale-nawasara-jobs');
-
-        // Untuk schedule
-        if ($this->app->runningInConsole()) {
-            $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
-                require __DIR__.'/../routes/console.php';
-            });
-        }
 
         // Config publish
         $this->publishes([
