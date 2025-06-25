@@ -151,7 +151,6 @@ $update = function (LivewireAlert $alert) {
 ?>
 
 <div>
-    @vite(['resources/css/tagify.css'])
     @assets
         <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify@4.20.0"></script>
     @endassets
