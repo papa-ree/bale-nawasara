@@ -52,7 +52,7 @@ class SyncDnsRecordsJob implements ShouldQueue
                 NawasaraMonitor::updateOrCreate(
                     ['dns_record_id' => $record['id']],
                     [
-                        'url' => 'https://' . $record['name'],
+                        'url' => 'https://'.$record['name'],
                         'look_for_string' => '',
                         'uptime_check_method' => 'get',
                         'certificate_check_enabled' => true,

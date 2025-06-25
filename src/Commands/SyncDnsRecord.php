@@ -5,9 +5,6 @@ namespace App\Console\Commands;
 use App\Jobs\SyncDnsRecordsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Paparee\BaleNawasara\App\Models\DnsRecord;
-use Paparee\BaleNawasara\App\Services\CloudflareService;
-use Spatie\UptimeMonitor\Models\Monitor;
 
 class SyncDnsRecord extends Command
 {
@@ -31,18 +28,18 @@ class SyncDnsRecord extends Command
     public function handle()
     {
         $this->info('Start Sync...');
-        
+
         SyncDnsRecordsJob::dispatch();
 
         $response = Http::withBasicAuth(env('WHATSAPP_GO_USER'), env('WHATSAPP_GO_PASSWORD'))
-        ->withHeaders([
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-        ])
-        ->post(env('WHATSAPP_GO_URL').'/send/message', [
-            'phone' => '6285239146416@s.whatsapp.net',
-            'message' => "DNS Record Sync Successfully",
-        ]);
+            ->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ])
+            ->post(env('WHATSAPP_GO_URL').'/send/message', [
+                'phone' => '6285239146416@s.whatsapp.net',
+                'message' => 'DNS Record Sync Successfully',
+            ]);
 
         $this->info('Sync Successfully');
 

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
-use Paparee\BaleNawasara\App\Models\DnsRecord;
 
 class PicContact extends Model
 {
@@ -63,7 +62,7 @@ class PicContact extends Model
         );
     }
 
-    public function subdomains() : HasMany
+    public function subdomains(): HasMany
     {
         return $this->hasMany(DnsRecord::class);
     }
