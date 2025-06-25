@@ -2,19 +2,16 @@
 
 namespace Paparee\BaleNawasara\App\Models;
 
-use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
-use Paparee\BaleNawasara\App\Traits\HasEncryptedAttributes;
 
 class PicContact extends Model
 {
     use HasUuids;
-    // use HasEncryptedAttributes;
 
     protected $guarded = ['id'];
 
