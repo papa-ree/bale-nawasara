@@ -7,6 +7,7 @@ use Paparee\BaleNawasara\App\Models\PicContact;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Paparee\BaleInv\App\Services\SatkerService;
 
 title('Add Contact');
 state(['edit_mode' => false, 'contact', 'contact_name', 'contact_phone', 'contact_nip', 'contact_job', 'contact_office', 'recovery_email_address', 'use_recovery_email' => true, 'user_uuid', 'subdomains']);
@@ -49,7 +50,14 @@ $availableRecords = computed(function () {
 });
 
 $availableLocations = computed(function () {
-    return cache()->get('bale_inv_maps', collect());
+    if (cache()->get('bale_inv_maps')) {
+        return cache()->get('bale_inv_maps', collect());
+    } else {
+        $satker = new SatkerService();
+        $satker->getLocations();
+
+        return cache()->get('bale_inv_maps', collect());
+    }
 });
 
 rules(
