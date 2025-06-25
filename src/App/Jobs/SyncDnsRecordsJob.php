@@ -8,8 +8,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
+use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
-use Spatie\UptimeMonitor\Models\Monitor;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -22,7 +22,12 @@ class SyncDnsRecordsJob implements ShouldQueue
 
         $records = collect($response ?? []);
 
+        // Kumpulkan semua ID yang masih aktif dari Cloudflare
+        $cloudflareIds = [];
+
         foreach ($records as $record) {
+            $cloudflareIds[] = $record['id'];
+
             DnsRecord::updateOrCreate(
                 ['id' => $record['id']],
                 [
@@ -44,16 +49,25 @@ class SyncDnsRecordsJob implements ShouldQueue
             );
 
             if ($record['type'] === 'A') {
-                $monitor = Monitor::updateOrCreate(
+                NawasaraMonitor::updateOrCreate(
                     ['dns_record_id' => $record['id']],
                     [
-                        'url' => 'https://'.$record['name'],
+                        'url' => 'https://' . $record['name'],
                         'look_for_string' => '',
-                        'uptime_check_method' => 'head',
+                        'uptime_check_method' => 'get',
+                        'certificate_check_enabled' => true,
                         'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
-                    ]);
+                    ]
+                );
             }
         }
+
+        // Hapus DNS record yang tidak ada di Cloudflare
+        DnsRecord::whereNotIn('id', $cloudflareIds)->each(function ($record) {
+            // Hapus relasi monitor terlebih dahulu
+            $record->monitor()->delete(); // asumsi relasi: $dnsRecord->monitor()
+            $record->delete();
+        });
 
         cache()->forget('dns_sync_status');
     }

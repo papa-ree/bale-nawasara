@@ -2,9 +2,6 @@
 
 namespace Paparee\BaleNawasara;
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schedule;
-use Paparee\BaleNawasara\Commands\BaleNawasaraCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -31,6 +28,10 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
         $this->publishes([
             __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
         ], 'bale-nawasara-views');
+
+        $this->publishes([
+            __DIR__.'/../resources/css' => resource_path('css'),
+        ], 'bale-nawasara-assets');
 
         // command
         $this->publishes([
@@ -61,7 +62,6 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             ->name('bale-nawasara')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_bale_nawasara_table')
-            ->hasCommand(BaleNawasaraCommand::class);
+            ->hasMigration('create_bale_nawasara_table');
     }
 }
