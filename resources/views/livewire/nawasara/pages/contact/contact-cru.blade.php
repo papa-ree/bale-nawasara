@@ -48,6 +48,10 @@ $availableRecords = computed(function () {
     return $query->pluck('name');
 });
 
+$availableLocations = computed(function () {
+    return cache()->get('bale_inv_maps', collect());
+});
+
 rules(
     fn() => [
         'contact_name' => 'required|string|min:3|max:50',
@@ -177,12 +181,29 @@ $update = function (LivewireAlert $alert) {
                 <x-input-error for="contact_job" />
             </div>
 
-            <div class="mb-4 sm:mb-6">
-                <x-bale.input wire:model='contact_office' label="Office" />
+            <div class="w-full mb-4 lg:w-1/2 md:w-3/4 gap-x-3 sm:mb-6">
+                <x-bale.select-dropdown label="select location" x-data="{ contactLocations: $wire.entangle('contact_office') }">
+                    <x-slot name="defaultValue">
+                        <span x-text="contactLocations == null ? 'Open this select menu' : contactLocations"></span>
+                    </x-slot>
+                    @foreach ($this->availableLocations as $key => $location)
+                        <label for="{{ $key . $location['id'] }}"
+                            class="flex w-full p-3 text-sm transition duration-200 ease-out bg-white hover:bg-gray-200 hover:rounded-lg dark:bg-neutral-900 hover:dark:border-neutral-700 dark:text-neutral-400"
+                            wire:key="{{ $key . $location['id'] }}" @click="title='{{ $location['description'] }}'">
+                            <span class="text-sm text-gray-500 dark:text-neutral-400">{{ $location['description'] }}
+
+                            </span>
+                            <input type="radio" name="contact_office" wire:model='contact_office'
+                                value="{{ $location['description'] }}"
+                                class="shrink-0 ms-auto mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                                id="{{ $key . $location['id'] }}">
+                        </label>
+                    @endforeach
+                </x-bale.select-dropdown>
                 <x-input-error for="contact_office" />
             </div>
 
-            <div class="block mb-4 md:flex md:w-1/2 gap-x-3 sm:mb-6" x-data="{ showEmail: $wire.entangle('use_recovery_email') }">
+            <div class="block w-full mb-4 md:flex lg:w-1/2 md:w-3/4 gap-x-3 sm:mb-6" x-data="{ showEmail: $wire.entangle('use_recovery_email') }">
                 <div class="w-full" wire:transition>
                     <label for="use_recovery_email"
                         class="flex items-center justify-between px-4 py-3 transition duration-200 border border-gray-200 rounded-lg dark:border-gray-700 hover:dark:bg-gray-700 hover:bg-gray-100">
@@ -210,6 +231,7 @@ $update = function (LivewireAlert $alert) {
                         placeholder='please select subdomains'>
                 </div>
             </div>
+
             <x-bale.modal-action>
                 <x-bale.button type='submit' label="store" />
             </x-bale.modal-action>

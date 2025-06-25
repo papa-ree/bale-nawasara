@@ -7,12 +7,37 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 
 class PicContact extends Model
 {
     use HasUuids;
 
     protected $guarded = ['id'];
+
+    protected function contactName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? Str::ucfirst($value) : null,
+            set: fn (?string $value) => $value ? Str::lower($value) : null,
+        );
+    }
+
+    protected function contactJob(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? Str::ucfirst($value) : null,
+            set: fn (?string $value) => $value ? Str::lower($value) : null,
+        );
+    }
+
+    protected function contactOffice(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? Str::ucfirst($value) : null,
+            set: fn (?string $value) => $value ? Str::lower($value) : null,
+        );
+    }
 
     protected function contactPhone(): Attribute
     {
