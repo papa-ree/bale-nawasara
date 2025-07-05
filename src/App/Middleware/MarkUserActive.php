@@ -17,6 +17,7 @@ class MarkUserActive
     public function handle(Request $request, Closure $next): Response
     {
         Cache::put('nawasara_user_active', true, now()->addMinutes(30));
+
         return $next($request);
     }
 }

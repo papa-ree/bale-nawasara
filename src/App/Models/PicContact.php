@@ -74,8 +74,8 @@ class PicContact extends Model
     protected function recoveryEmailAddress(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? Crypt::decryptString($value) : "-",
-            set: fn (?string $value) => $value ? Crypt::encryptString($value) : "-",
+            get: fn (?string $value) => $value ? Crypt::decryptString($value) : '-',
+            set: fn (?string $value) => $value ? Crypt::encryptString($value) : '-',
         );
     }
 

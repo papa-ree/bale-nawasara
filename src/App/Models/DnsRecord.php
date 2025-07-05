@@ -2,7 +2,6 @@
 
 namespace Paparee\BaleNawasara\App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,13 +18,13 @@ class DnsRecord extends Model
     protected $keyType = 'string';
 
     protected static array $errorPatterns = [
-        'SSL Handshake Error (525)'         => ['code 525', 'error code: 525', 'resulted in a 525'],
-        'SSL Handshake Error (526)'         => ['526'],
-        'DNS Resolution Error (curl 6)'     => ['curl error 6'],
-        'Failed to Connect (curl 7)'        => ['curl error 7'],
-        'SSL Certificate Error (curl 60)'   => ['curl error 60', 'ssl certificate problem'],
-        '404 Not Found'                     => ['404 not found', 'response: 404', 'status 404'],
-        'Internal Server Error'             => ['500 internal server error', 'response: 500', 'status 500', 'server error'],
+        'SSL Handshake Error (525)' => ['code 525', 'error code: 525', 'resulted in a 525'],
+        'SSL Handshake Error (526)' => ['526'],
+        'DNS Resolution Error (curl 6)' => ['curl error 6'],
+        'Failed to Connect (curl 7)' => ['curl error 7'],
+        'SSL Certificate Error (curl 60)' => ['curl error 60', 'ssl certificate problem'],
+        '404 Not Found' => ['404 not found', 'response: 404', 'status 404'],
+        'Internal Server Error' => ['500 internal server error', 'response: 500', 'status 500', 'server error'],
     ];
 
     public function getUptimeFailureReasonAttribute(): string

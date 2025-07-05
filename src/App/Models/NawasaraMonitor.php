@@ -9,6 +9,7 @@ use Spatie\UptimeMonitor\Models\Monitor;
 class NawasaraMonitor extends Monitor
 {
     protected $table = 'monitors';
+
     protected $guarded = ['id'];
 
     protected $primaryKey = 'id';
