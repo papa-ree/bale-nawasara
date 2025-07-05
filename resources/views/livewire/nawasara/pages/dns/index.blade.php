@@ -41,6 +41,10 @@ mount(function () {
     </div> --}}
 
     <livewire:nawasara.pages.dns.section.dns-record-table />
+
+    <x-bale.modal modalId="dnsRecordModal" size="2xl" staticBackdrop>
+        <livewire:nawasara.pages.dns.modal.record-detail-modal />
+    </x-bale.modal>
 </div>
 
 {{-- script for direct api --}}

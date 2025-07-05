@@ -3,8 +3,8 @@
 namespace Paparee\BaleNawasara\App\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncDnsRecordsJob;
 use Illuminate\Support\Facades\Cache;
-use Paparee\BaleNawasara\App\Jobs\SyncDnsRecordsJob;
 
 class DnsRecordController extends Controller
 {

@@ -52,10 +52,18 @@ on([
                     </div>
                 </th>
                 <th scope="col"
+                    class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell">
+                    <div class="flex items-center gap-x-2">
+                        <span class="text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
+                            {{ __('Proxied Status') }}
+                        </span>
+                    </div>
+                </th>
+                <th scope="col"
                     class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">
                     <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
-                            {{ __('Created At') }}
+                            {{ __('Monitor status') }}
                         </span>
                     </div>
                 </th>
@@ -75,6 +83,7 @@ on([
                                 modalTitle: 'Record Detail',
                                 recordData: @js($record),
                                 recordStatus: @js($record->monitor ? $record->monitor : ''),
+                                recordContact: @js($record->contact ?? ''),
                             });
                         },
                     }">
@@ -124,8 +133,8 @@ on([
                             <div class="flex items-center ml-3 cursor-pointer gap-x-2" x-data="{ showExternalLink: false }"
                                 @mouseenter="showExternalLink=true" @mouseleave="showExternalLink=false">
                                 <div @click="openDnsRecordModal">{{ $record->name }}</div>
-                                <a href="{{ $record->type === 'A' ? 'https://' . $record->name : '#' }}" target="blank_"
-                                    class="" x-show="showExternalLink">
+                                <a href="{{ $record->type === 'A' ? 'https://' . $record->name . '.ponorogo.go.id' : '#' }}"
+                                    target="blank_" class="" x-show="showExternalLink">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -152,10 +161,54 @@ on([
                                     @endforeach --}}
                                 </span>
                             </dd>
-                            <dt class="sr-only sm:hidden">Created At</dt>
+                            <dt class="sr-only md:hidden">Proxied Status</dt>
+                            <dd class="mt-1 text-gray-500 truncate md:hidden">
+                                <span class="block text-xs text-gray-500">Proxied Status
+                                    <div class="flex items-center gap-x-2">
+                                        @if ($record->proxied)
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="text-orange-400 lucide lucide-cloud-check-icon lucide-cloud-check">
+                                                <path d="m17 15-5.5 5.5L9 18" />
+                                                <path d="M5 17.743A7 7 0 1 1 15.71 10h1.79a4.5 4.5 0 0 1 1.5 8.742" />
+                                            </svg>
+                                            Proxied
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="lucide lucide-cloud-alert-icon lucide-cloud-alert">
+                                                <path d="M12 12v4" />
+                                                <path d="M12 20h.01" />
+                                                <path d="M17 18h.5a1 1 0 0 0 0-9h-1.79A7 7 0 1 0 7 17.708" />
+                                            </svg>
+                                            DNS Only
+                                        @endif
+                                    </div>
+                                </span>
+                            </dd>
+                            <dt class="sr-only sm:hidden">Monitor Status</dt>
                             <dd class="mt-1 text-gray-500 truncate sm:hidden">
-                                <span class="block text-xs text-gray-500">Created At
-                                    {{ $record->created_at }}</span>
+                                <span class="block text-xs text-gray-500">Monitor Status
+                                    <div class="flex items-center gap-x-2">
+                                        @if ($record->monitor)
+                                            <div
+                                                class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->uptime_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                                Uptime
+                                            </div>
+                                            <div
+                                                class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->certificate_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                                SSL
+                                            </div>
+                                        @else
+                                            <div
+                                                class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border border-gray-200 bg-white text-gray-800 shadow-2xs dark:bg-neutral-900 dark:border-neutral-700 dark:text-white">
+                                                No Monitor Service
+                                            </div>
+                                        @endif
+                                    </div>
+                                </span>
                             </dd>
                         </dl>
                     </td>
@@ -168,14 +221,54 @@ on([
                         {{ Illuminate\Support\Str::limit($record->content, 15) }}
                     </td>
 
+                    <td class="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
+                        <div class="flex items-center gap-x-2">
+                            @if ($record->proxied)
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="text-orange-400 lucide lucide-cloud-check-icon lucide-cloud-check">
+                                    <path d="m17 15-5.5 5.5L9 18" />
+                                    <path d="M5 17.743A7 7 0 1 1 15.71 10h1.79a4.5 4.5 0 0 1 1.5 8.742" />
+                                </svg>
+                                Proxied
+                            @else
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-cloud-alert-icon lucide-cloud-alert">
+                                    <path d="M12 12v4" />
+                                    <path d="M12 20h.01" />
+                                    <path d="M17 18h.5a1 1 0 0 0 0-9h-1.79A7 7 0 1 0 7 17.708" />
+                                </svg>
+                                DNS Only
+                            @endif
+                        </div>
+                    </td>
+
                     <td class="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-                        <span
-                            class="block text-sm text-gray-500">{{ date_format($record->created_at, 'd-M-Y') }}</span>
+                        <div class="flex items-center gap-x-2">
+                            @if ($record->monitor)
+                                <div
+                                    class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->uptime_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                    Uptime
+                                </div>
+                                <div
+                                    class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->certificate_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                    SSL
+                                </div>
+                            @else
+                                <div
+                                    class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border border-gray-200 bg-white text-gray-800 shadow-2xs dark:bg-neutral-900 dark:border-neutral-700 dark:text-white">
+                                    No Monitor Service
+                                </div>
+                            @endif
+                        </div>
                     </td>
 
                     <td class="py-4 pl-3 pr-4 text-sm font-medium text-right ">
                         <div class="hs-dropdown relative inline-block [--placement:bottom|left]">
-                            <button id="hs-table-dropdown-{{ $record->name }}" type="button"
+                            <button id="hs-table-dropdown-{{ $record->id }}" type="button"
                                 class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-emerald-300 transition-all text-sm dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
                                 <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24"
                                     height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -186,14 +279,14 @@ on([
                                 </svg>
                             </button>
                             <div class="hs-dropdown-menu transition-[opacity,margin] duration hs-dropdown-open:opacity-100 opacity-0 hidden divide-y divide-gray-200 min-w-40 z-10 bg-white shadow-2xl rounded-lg p-2 mt-2 dark:divide-neutral-700 dark:bg-neutral-800 dark:border dark:border-neutral-700"
-                                aria-labelledby="hs-table-dropdown-{{ $record->name }}">
+                                aria-labelledby="hs-table-dropdown-{{ $record->id }}">
                                 <div class="py-2 first:pt-0 last:pb-0">
 
-                                    {{-- <button x-data
+                                    <button x-data
                                         class="flex items-center w-full px-3 py-2 text-sm text-gray-800 rounded-lg gap-x-3 hover:bg-gray-100 focus:ring-2 focus:ring-emerald-500 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
                                         @click="openDnsRecordModal">
-                                        Edit
-                                    </button> --}}
+                                        Details
+                                    </button>
 
                                 </div>
 
@@ -210,8 +303,4 @@ on([
             @endforeach
         </x-slot>
     </x-bale.table>
-
-    <x-bale.modal modalId="dnsRecordModal" size="xl">
-        <livewire:nawasara.pages.dns.modal.record-detail-modal />
-    </x-bale.modal>
 </div>

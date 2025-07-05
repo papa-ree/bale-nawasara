@@ -55,6 +55,7 @@ class WagoController extends Controller
             ], $response->status());
 
         } catch (\Exception $e) {
+            info('Wago Error message: ', $e->getMessage());
             return response()->json([
                 'code' => 500,
                 'message' => 'Please Contact Administrator',

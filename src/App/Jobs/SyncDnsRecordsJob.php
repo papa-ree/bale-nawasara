@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Jobs;
+namespace Paparee\BaleNawasara\App\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
@@ -19,6 +20,8 @@ class SyncDnsRecordsJob implements ShouldQueue
     {
         $cf = new CloudflareService;
         $response = $cf->getDnsRecords();
+
+        Cache::put('dns_sync_timestamp', now());
 
         $records = collect($response ?? []);
 
