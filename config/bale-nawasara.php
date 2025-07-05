@@ -7,4 +7,16 @@ return [
         'zone_id' => env('CLOUDFLARE_ZONE_ID'),
     ],
 
+    'mikrotik' => [
+        'cache_lifetime' => 60,
+    ],
+    
+    'whatsapp' => [
+        'secret' => env('WHATSAPP_WEBHOOK_SECRET'),
+    ],
+
+    'instansi_location' => [
+        'api' => 'https://sadap.ponorogo.go.id/api/dataPeta',
+    ],
+
 ];
