@@ -30,18 +30,18 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $nawasara = new NawasaraMonitor();
-        $pic = new PicContact();
-        $dns = new DnsRecord();
-        $monitor = new NawasaraMonitor();
+        $nawasara = new NawasaraMonitor;
+        $pic = new PicContact;
+        $dns = new DnsRecord;
+        $monitor = new NawasaraMonitor;
         $dns_sync_timestamp = cache()->get('dns_sync_timestamp') ?? null;
-        $wago_hit_today = new NawasaraTokenDailyHit();
+        $wago_hit_today = new NawasaraTokenDailyHit;
 
         Cache::put('nawasara_summary', [
             'monitored_subdomains' => $nawasara->count(),
             'new_monitored_subdomains' => $nawasara->whereBetween('created_at', [now()->subDays(7), now()])->count(),
             'valid_ssl' => $nawasara->whereCertificateStatus('valid')->count(),
-            'ssl_expiring' => $nawasara->whereNotNull('certificate_expiration_date')->whereBetween('certificate_expiration_date',[now(),now()->addDays(30)])->count(),
+            'ssl_expiring' => $nawasara->whereNotNull('certificate_expiration_date')->whereBetween('certificate_expiration_date', [now(), now()->addDays(30)])->count(),
             'pic_contacts' => $pic->count(),
             'new_pic_contacts' => $pic->whereBetween('created_at', [now()->subDays(7), now()])->count(),
             'whatsapp_sent_today' => $wago_hit_today->whereDate('created_at', now()->toDateString())->count(),
