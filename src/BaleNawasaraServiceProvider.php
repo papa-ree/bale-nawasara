@@ -43,12 +43,6 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             __DIR__.'/../src/App/Jobs' => app_path('Jobs'),
         ], 'bale-nawasara-jobs');
 
-        // Config publish
-        $this->publishes([
-            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
-            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
-            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
-        ], 'bale-nawasara-config');
     }
 
     public function configurePackage(Package $package): void
