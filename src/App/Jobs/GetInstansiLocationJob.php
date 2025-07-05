@@ -15,7 +15,9 @@ class GetInstansiLocationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected string $url = 'https://sadap.ponorogo.go.id/api/dataPeta';
+
     protected string $cacheKey = 'bale_inv_maps';
+
     protected int $cacheMinutes = 1440;
 
     /**
