@@ -34,7 +34,7 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
         $pic = new PicContact;
         $dns = new DnsRecord;
         $monitor = new NawasaraMonitor;
-        $dns_sync_timestamp = cache()->get('dns_sync_timestamp') ?? null;
+        $dns_sync_timestamp = cache()->get('dns_sync_timestamp') ?? now();
         $wago_hit_today = new NawasaraTokenDailyHit;
 
         Cache::put('nawasara_summary', [
@@ -46,7 +46,7 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
             'new_pic_contacts' => $pic->whereBetween('created_at', [now()->subDays(7), now()])->count(),
             'whatsapp_sent_today' => $wago_hit_today->whereDate('created_at', now()->toDateString())->count(),
             'dns_records' => $dns->count(),
-            'last_sync_dns_record' => $dns_sync_timestamp,
+            'last_sync_dns_record' => $dns_sync_timestamp->diffForHumans(),
             'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->count(), 'down' => $monitor->whereUptimeStatus('down')->count()],
         ], now()->addMinutes(10));
     }
