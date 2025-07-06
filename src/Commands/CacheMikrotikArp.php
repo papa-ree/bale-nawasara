@@ -3,8 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Cache;
-use Paparee\BaleNawasara\App\Services\MikrotikService;
+use Paparee\BaleNawasara\App\Jobs\SyncMikrotikBgpJob;
 
 class CacheMikroTikArp extends Command
 {
@@ -12,13 +11,10 @@ class CacheMikroTikArp extends Command
 
     protected $description = 'Get ARP list from MikroTik and cache it';
 
-    public function handle(MikrotikService $mikroTik)
+    public function handle()
     {
         try {
-            $arpList = $mikroTik->getArpList();
-
-            Cache::put('mikrotik_arp_list', $arpList, now()->addMinutes(config('bale-nawasara.mikrotik.cache_lifetime')));
-
+            SyncMikrotikBgpJob::dispatch();
             $this->info('ARP list cached successfully.');
         } catch (\Throwable $e) {
             $this->error('Failed to fetch ARP: '.$e->getMessage());
