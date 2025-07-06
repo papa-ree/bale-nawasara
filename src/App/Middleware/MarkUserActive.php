@@ -5,6 +5,7 @@ namespace Paparee\BaleNawasara\App\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Paparee\BaleNawasara\App\Jobs\GenerateNawasaraSummaryJob;
 use Symfony\Component\HttpFoundation\Response;
 
 class MarkUserActive
@@ -17,6 +18,7 @@ class MarkUserActive
     public function handle(Request $request, Closure $next): Response
     {
         Cache::put('nawasara_user_active', true, now()->addMinutes(30));
+        GenerateNawasaraSummaryJob::dispatch();
 
         return $next($request);
     }
