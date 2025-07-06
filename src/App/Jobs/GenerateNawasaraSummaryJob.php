@@ -44,7 +44,7 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
             'ssl_expiring' => $nawasara->whereNotNull('certificate_expiration_date')->whereBetween('certificate_expiration_date', [now(), now()->addDays(30)])->count(),
             'pic_contacts' => $pic->count(),
             'new_pic_contacts' => $pic->whereBetween('created_at', [now()->subDays(7), now()])->count(),
-            'whatsapp_sent_today' => $wago_hit_today->whereDate('created_at', now()->toDateString())->count(),
+            'whatsapp_sent_today' => $wago_hit_today->whereDate('created_at', now()->toDateString())->sum('hit_count'),
             'dns_records' => $dns->count(),
             'last_sync_dns_record' => $dns_sync_timestamp->diffForHumans(),
             'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->count(), 'down' => $monitor->whereUptimeStatus('down')->count()],
