@@ -180,7 +180,7 @@ state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
                                 <polyline points="12 6 12 12 16 14" />
                             </svg>
                             <span class="ml-1 text-gray-500 dark:text-gray-400">Last sync:
-                                {{ $last_sync_dns_record->diffForHumans() }}</span>
+                                {{ $last_sync_dns_record }}</span>
                         </div>
                     </div>
 
