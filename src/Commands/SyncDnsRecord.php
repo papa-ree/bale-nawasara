@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\SyncDnsRecordsJob;
+use Paparee\BaleNawasara\App\Jobs\SyncDnsRecordsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
