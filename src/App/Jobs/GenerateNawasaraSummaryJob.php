@@ -48,7 +48,7 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
             'whatsapp_sent_today' => $wago_hit_today->whereDate('created_at', now()->toDateString())->sum('hit_count'),
             'dns_records' => $dns->count(),
             'last_sync_dns_record' => $dns_sync_timestamp->diffForHumans(),
-            'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->count(), 'down' => $monitor->whereUptimeStatus('down')->count()],
+            'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->whereUptimeCheckEnabled(true)->count(), 'down' => $monitor->whereUptimeStatus('down')->whereUptimeCheckEnabled(true)->count()],
         ]);
     }
 }
