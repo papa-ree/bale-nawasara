@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Paparee\BaleNawasara\App\Jobs\SyncDnsRecordsJob;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Paparee\BaleNawasara\App\Jobs\SyncDnsRecordsJob;
 
 class SyncDnsRecord extends Command
 {
