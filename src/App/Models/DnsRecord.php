@@ -2,6 +2,7 @@
 
 namespace Paparee\BaleNawasara\App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,6 +54,13 @@ class DnsRecord extends Model
     {
         return Attribute::make(
             get: fn (string $value) => Str::remove('"', Str::limit($value, 20, '')),
+        );
+    }
+
+    protected function createdOn(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => Carbon::parse($value)->diffForHumans(),
         );
     }
 

@@ -39,7 +39,8 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
 
         Cache::put('nawasara_summary', [
             'monitored_subdomains' => $nawasara->count(),
-            'new_monitored_subdomains' => $nawasara->whereBetween('created_at', [now()->subDays(7), now()])->count(),
+            'new_monitored_subdomains' => $nawasara->whereBetween('created_at', [now()->subDays(7), now()->addDays(1)])->count(),
+            'disabled_monitor' => $nawasara->whereUptimeCheckEnabled(false)->count(),
             'valid_ssl' => $nawasara->whereCertificateStatus('valid')->count(),
             'ssl_expiring' => $nawasara->whereNotNull('certificate_expiration_date')->whereBetween('certificate_expiration_date', [now(), now()->addDays(30)])->count(),
             'pic_contacts' => $pic->count(),
@@ -48,6 +49,6 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
             'dns_records' => $dns->count(),
             'last_sync_dns_record' => $dns_sync_timestamp->diffForHumans(),
             'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->count(), 'down' => $monitor->whereUptimeStatus('down')->count()],
-        ], now()->addMinutes(10));
+        ]);
     }
 }
