@@ -8,7 +8,9 @@ new class extends Component {
     #[Computed]
     public function newSubdomains()
     {
-        return DnsRecord::whereBetween('created_on', [now()->subDays(7), now()->addDays(1)])->get();
+        return DnsRecord::whereBetween('created_on', [now()->subDays(7), now()->addDays(1)])
+            ->orderByDesc('created_on')
+            ->get();
     }
 }; ?>
 
