@@ -4,10 +4,29 @@ use Livewire\Volt\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Locked;
 
 new class extends Component {
     public $uptime_check_enabled;
     public $certificate_check_enabled;
+
+    #[Locked]
+    public $monitorId;
+
+    public $monitor;
+
+    #[On('getMonitorSslStatus')]
+    public function getMonitorSslStatus($monitorId)
+    {
+        // dump($id);
+        $this->monitor = NawasaraMonitor::find($monitorId);
+
+        if ($this->monitor) {
+            $this->uptime_check_enabled = $this->monitor->uptime_check_enabled;
+            $this->certificate_check_enabled = $this->monitor->certificate_check_enabled;
+        }
+    }
 
     public function update(LivewireAlert $alert, $record_id)
     {
@@ -33,11 +52,17 @@ new class extends Component {
 
             DB::commit();
 
-            session()->flash('saved', [
-                'title' => 'Update Success!',
-            ]);
+            $this->dispatch('closeBaleModal', id: 'dnsRecordModal');
 
-            $this->redirect('dns', navigate: true);
+            $alert->title('Update Success!')->position('top-end')->success()->toast()->show();
+
+            $this->dispatch('disabling-button', params: false);
+
+            // session()->flash('saved', [
+            //     'title' => 'Update Success!',
+            // ]);
+
+            // $this->redirect('dns', navigate: true);
         } catch (\Throwable $th) {
             $this->dispatch('disabling-button', params: false);
 
@@ -60,7 +85,7 @@ new class extends Component {
             this.recordType = '';
             this.recordContent = '';
             this.recordProxied = '';
-            this.recordMonitorId = '';
+            this.monitorId = '';
             this.monitorUptimeStatus = '';
             this.monitorUptimeFailedReason = '';
             this.monitorUptimeCheckEnabled = null;
@@ -82,7 +107,7 @@ new class extends Component {
             this.recordType = detail.recordData.type;
             this.recordContent = detail.recordData.content;
             this.recordProxied = detail.recordData.proxied;
-            this.recordMonitorId = detail.recordStatus.id;
+            this.monitorId = detail.recordStatus.id;
             this.monitorUptimeStatus = detail.recordStatus.uptime_status;
             this.monitorUptimeFailedReason = detail.recordStatus.uptime_check_failure_reason;
             this.monitorUptimeCheckEnabled = detail.recordStatus.uptime_check_enabled;
@@ -125,19 +150,19 @@ new class extends Component {
 
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Content</p>
-                            <p class="font-semibold text-gray-800 dark:text-white" x-text="recordContent"></p>
+                            <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="recordContent"></p>
                         </div>
 
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Proxied</p>
-                            <p class="font-semibold text-gray-800 dark:text-white"
+                            <p class="mt-1 font-semibold text-gray-800 dark:text-white"
                                 x-text="recordProxied ? 'Yes' : 'No'">
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div class="sm:pr-10">
+                <div class="sm:pr-10" x-show="monitorId">
                     <h3 class="mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">
                         Monitoring
                         Status</h3>
@@ -186,9 +211,9 @@ new class extends Component {
             </div>
 
             {{-- <!-- Right Column - Status and Contact --> --}}
-            <div class="flex-1">
+            <div class="flex-1" x-show="monitorId">
 
-                {{-- <!-- PIC Contact --> --}}
+                {{-- PIC contact --}}
                 <div class="mb-8">
                     <h3 class="mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">
                         PIC Contact
@@ -225,7 +250,27 @@ new class extends Component {
                         Monitoring Setting
                     </h3>
 
-                    <div class="space-y-4">
+                    <div class="space-y-4 animate-pulse" wire:loading>
+                        <!-- Skeleton uptime -->
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-2">
+                                <div class="w-40 h-4 bg-gray-300 rounded dark:bg-neutral-700"></div>
+                                <div class="h-3 bg-gray-200 rounded w-60 dark:bg-neutral-600"></div>
+                            </div>
+                            {{-- <div class="w-5 h-5 mt-1 bg-gray-300 rounded-full dark:bg-neutral-700"></div> --}}
+                        </div>
+
+                        <!-- Skeleton ssl -->
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-2">
+                                <div class="w-32 h-4 bg-gray-300 rounded dark:bg-neutral-700"></div>
+                                <div class="h-3 bg-gray-200 rounded w-52 dark:bg-neutral-600"></div>
+                            </div>
+                            {{-- <div class="w-5 h-5 mt-1 bg-gray-300 rounded-full dark:bg-neutral-700"></div> --}}
+                        </div>
+                    </div>
+
+                    <div class="space-y-4" wire:loading.remove>
                         {{-- uptime --}}
                         <div class="flex items-center justify-between">
                             <label for="uptime-monitor" class="">
@@ -235,12 +280,13 @@ new class extends Component {
                                     class="block text-sm text-gray-600 dark:text-neutral-500">
                                     Enable uptime monitoring
                                 </span>
+                                {{-- {{ $uptime_check_enabled }} --}}
                             </label>
                             <div class="flex items-center h-5 mt-1">
                                 <input id="uptime-monitor" name="uptime-monitor" type="checkbox"
-                                    wire:model='uptime_check_enabled' x-model="monitorUptimeCheckEnabled"
+                                    wire:model='uptime_check_enabled'
                                     class="w-5 h-5 transition duration-200 border-gray-400 rounded-full text-emerald-400 focus:ring-emerald-500 checked:border-emerald-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-emerald-500 dark:checked:border-emerald-500 dark:focus:ring-offset-gray-800"
-                                    aria-describedby="uptime-monitor-description" :checked="monitorUptimeCheckEnabled">
+                                    aria-describedby="uptime-monitor-description">
                             </div>
                         </div>
 
@@ -254,12 +300,13 @@ new class extends Component {
                                     class="block text-sm text-gray-600 dark:text-neutral-500">
                                     Enable SSL certificate validation
                                 </span>
+                                {{-- {{ $certificate_check_enabled }} --}}
                             </label>
                             <div class="flex items-center h-5 mt-1">
                                 <input id="ssl-check" name="ssl-check" type="checkbox"
-                                    wire:model='certificate_check_enabled' x-model="monitorSslCheckEnabled"
+                                    wire:model='certificate_check_enabled'
                                     class="w-5 h-5 transition duration-200 border-gray-400 rounded-full text-emerald-400 focus:ring-emerald-500 checked:border-emerald-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-emerald-500 dark:checked:border-emerald-500 dark:focus:ring-offset-gray-800"
-                                    aria-describedby="ssl-check-description" :checked="monitorSslCheckEnabled">
+                                    aria-describedby="ssl-check-description">
                             </div>
                         </div>
                     </div>

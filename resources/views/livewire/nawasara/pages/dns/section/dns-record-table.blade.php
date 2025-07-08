@@ -79,6 +79,7 @@ on([
                     x-data="{
                         openDnsRecordModal() {
                             $wire.dispatch('openBaleModal', { id: 'dnsRecordModal' });
+                            $wire.dispatch('getMonitorSslStatus', { monitorId: @js($record->monitor ? $record->monitor->id : '') ?? '' });
                             this.$dispatch('record-data', {
                                 modalTitle: 'Record Detail',
                                 recordData: @js($record),
