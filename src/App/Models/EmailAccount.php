@@ -14,7 +14,7 @@ class EmailAccount extends Model
     use HasUuids;
 
     protected $guarded = ['id'];
-    
+
     public function contact(): BelongsTo
     {
         return $this->belongsTo(PicContact::class, 'pic_contact_id');
