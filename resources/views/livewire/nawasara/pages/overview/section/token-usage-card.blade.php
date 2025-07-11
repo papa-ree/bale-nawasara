@@ -2,22 +2,24 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Computed;
-use Paparee\BaleNawasara\App\Models\DnsRecord;
+use Paparee\BaleNawasara\App\Models\NawasaraAccessToken;
 
 new class extends Component {
     #[Computed]
-    public function newSubdomains()
+    public function tokenUsage()
     {
-        return DnsRecord::whereBetween('created_on', [now()->subDays(7), now()->addDays(1)])
-            ->orderByDesc('created_on')
+        return NawasaraAccessToken::withSum('dailyHits', 'hit_count')
+            ->whereNotIn('name', ['dev'])
+            ->orderByDesc('daily_hits_sum_hit_count')
+            ->take(3)
             ->get();
     }
 }; ?>
 
 <div class="p-6 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
     <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Uptime Monitor</h2>
-        <a href="/dns" wire:navigate:hover
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Token Usage</h2>
+        <a href="/email" wire:navigate:hover
             class="flex items-center px-3 py-1 text-sm rounded-lg text-primary-500 dark:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700">
             View All
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -31,28 +33,23 @@ new class extends Component {
         <table class="w-full text-sm text-left">
             <thead class="text-xs text-gray-700 uppercase dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50">
                 <tr>
-                    <th class="px-4 py-3">Subdomain</th>
-                    <th class="px-4 py-3">Type</th>
-                    <th class="px-4 py-3">Comment</th>
-                    <th class="px-4 py-3">Created On</th>
+                    <th class="px-4 py-3">Token Name</th>
+                    <th class="px-4 py-3">Today Hit</th>
+                    <th class="px-4 py-3">Total Hit</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($this->newSubdomains as $subdomain)
+                @foreach ($this->tokenUsage as $token)
                     <tr
                         class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                            {{ $subdomain->name }}
-                        </td>
-                        <td class="px-4 py-3">{{ $subdomain->type }}</td>
-                        <td class="px-4 py-3">
-                            <span
-                                class="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">
-                                {{ $subdomain->comment }}
-                            </span>
+                            {{ $token->name }}
                         </td>
                         <td class="px-4 py-3">
-                            {{ $subdomain->created_on }}
+                            {{ $token->todayHits() }}
+                        </td>
+                        <td class="px-4 py-3">
+                            {{ $token->totalHits() }}
                         </td>
                     </tr>
                 @endforeach

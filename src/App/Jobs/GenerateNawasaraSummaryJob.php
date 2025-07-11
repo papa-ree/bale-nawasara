@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
+use Paparee\BaleNawasara\App\Models\EmailAccount;
 use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Models\NawasaraTokenDailyHit;
 use Paparee\BaleNawasara\App\Models\PicContact;
@@ -36,6 +37,8 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
         $monitor = new NawasaraMonitor;
         $dns_sync_timestamp = cache()->get('dns_sync_timestamp') ?? now();
         $wago_hit_today = new NawasaraTokenDailyHit;
+        $email = new EmailAccount();
+        $email_sync_timestamp = cache()->get('email_sync_timestamp') ?? now();
 
         Cache::put('nawasara_summary', [
             'monitored_subdomains' => $nawasara->count(),
@@ -49,6 +52,8 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
             'dns_records' => $dns->count(),
             'last_sync_dns_record' => $dns_sync_timestamp->diffForHumans(),
             'uptime_monitor' => ['up' => $monitor->whereUptimeStatus('up')->whereUptimeCheckEnabled(true)->count(), 'down' => $monitor->whereUptimeStatus('down')->whereUptimeCheckEnabled(true)->count()],
+            'email' => $email->count(),
+            'last_sync_email' => $email_sync_timestamp->diffForHumans(),
         ]);
     }
 }

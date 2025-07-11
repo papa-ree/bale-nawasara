@@ -22,13 +22,13 @@ class UptimeCheckRecovered extends NotificationsUptimeCheckRecovered
                     ->timestamp(Carbon::now());
             });
 
-        $database = NawasaraNotification::create([
-            'type' => self::class,
-            'notifiable_id' => 1, // ID pengguna atau entitas terkait
-            'notifiable_type' => 'App\Models\User', // Sesuaikan model pengguna
-            'data' => json_encode($slack),
-            'read_at' => null,
-        ]);
+        // $database = NawasaraNotification::create([
+        //     'type' => self::class,
+        //     'notifiable_id' => 1, // ID pengguna atau entitas terkait
+        //     'notifiable_type' => 'App\Models\User', // Sesuaikan model pengguna
+        //     'data' => json_encode($slack),
+        //     'read_at' => null,
+        // ]);
 
         return $slack;
     }

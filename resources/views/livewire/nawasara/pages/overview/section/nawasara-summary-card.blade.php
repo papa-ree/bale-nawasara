@@ -17,6 +17,8 @@ state(['whatsapp_sent_today' => fn() => $this->summary['whatsapp_sent_today'] ??
 state(['dns_records' => fn() => $this->summary['dns_records'] ?? 'N/A']);
 state(['last_sync_dns_record' => fn() => $this->summary['last_sync_dns_record'] ?? 'N/A']);
 state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
+state(['email' => fn() => $this->summary['email'] ?? 'N/A']);
+state(['last_sync_email' => fn() => $this->summary['last_sync_email'] ?? 'N/A']);
 ?>
 
 <div>
@@ -217,15 +219,6 @@ state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
                 <div class="p-5 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
                     <div class="flex items-start justify-between">
                         <div class="p-3 bg-gray-100 dark:bg-gray-900/30 rounded-xl">
-                            {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"
-                                class="text-gray-500 lucide lucide-monitor-off dark:text-gray-400">
-                                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                                <path d="M3 3v5h5" />
-                                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                                <path d="M16 16h5v5" />
-                            </svg> --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
@@ -255,8 +248,41 @@ state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
                     {{-- </div> --}}
                 </div>
 
-                {{-- <!-- MikroTik IP Card -->
-                    <div class="p-5 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
+                {{-- Email Account --}}
+                <div class="p-5 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
+                    <div class="flex items-start justify-between">
+                        <div class="p-3 bg-orange-100 dark:bg-orange-900/30 rounded-xl">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="text-orange-500 lucide lucide-mail dark:text-orange-400">
+                                <rect width="20" height="16" x="2" y="4" rx="2" />
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                            </svg>
+                        </div>
+                        <span
+                            class="px-2 py-1 text-xs rounded-full text-emerald-800 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">Synced</span>
+                    </div>
+                    <h3 class="mt-4 mb-1 text-lg font-medium text-gray-700 dark:text-gray-300">
+                        Ponorogo Email Accounts
+                    </h3>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ $email }}</p>
+
+                    <div class="flex items-center mt-4 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="lucide lucide-clock">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span class="ml-1 text-gray-500 dark:text-gray-400">
+                            Last sync: {{ $last_sync_email }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- MikroTik IP Card -->
+                {{-- <div class="p-5 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
                         <div class="flex items-start justify-between">
                             <div class="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -285,37 +311,9 @@ state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
                             </svg>
                             <span class="ml-1 text-gray-500 dark:text-gray-400">All online</span>
                         </div>
-                    </div>
-
-                    <!-- Email Accounts Card -->
-                    <div class="p-5 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
-                        <div class="flex items-start justify-between">
-                            <div class="p-3 bg-red-100 dark:bg-red-900/30 rounded-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="text-red-500 lucide lucide-mail dark:text-red-400">
-                                    <rect width="20" height="16" x="2" y="4" rx="2" />
-                                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-                                </svg>
-                            </div>
-                            <span
-                                class="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">Stable</span>
-                        </div>
-                        <h3 class="mt-4 mb-1 text-lg font-medium text-gray-700 dark:text-gray-300">WHM Email Accounts
-                        </h3>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">86</p>
-                        <div class="flex items-center mt-4 text-xs">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-inbox">
-                                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-                                <path
-                                    d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-                            </svg>
-                            <span class="ml-1 text-gray-500 dark:text-gray-400">15 unread messages</span>
-                        </div>
                     </div> --}}
+
+
 
             </div>
         </div>
@@ -324,80 +322,11 @@ state(['uptime_monitor' => fn() => $this->summary['uptime_monitor'] ?? 'N/A']);
             <!-- Uptime Monitor Table -->
             <livewire:nawasara.pages.overview.section.new-subdomain-card />
 
-            {{-- <!-- Token Usage Table -->
-            <div class="p-6 transition-all bg-white shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-lg">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Token Usage</h2>
-                    <button
-                        class="flex items-center px-3 py-1 text-sm rounded-lg text-primary-500 dark:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        View All
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="ml-1 lucide lucide-chevron-right">
-                            <path d="m9 18 6-6-6-6" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead
-                            class="text-xs text-gray-700 uppercase dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50">
-                            <tr>
-                                <th class="px-4 py-3">Token</th>
-                                <th class="px-4 py-3">Usage Today</th>
-                                <th class="px-4 py-3">Limit</th>
-                                <th class="px-4 py-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr
-                                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3 font-mono text-gray-900 dark:text-white">aBcD1234eFgH</td>
-                                <td class="px-4 py-3">42</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3"><span
-                                        class="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">OK</span>
-                                </td>
-                            </tr>
-                            <tr
-                                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3 font-mono text-gray-900 dark:text-white">iJkL5678mNoP</td>
-                                <td class="px-4 py-3">87</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3"><span
-                                        class="px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900/30 dark:text-yellow-400">Nearing
-                                        limit</span></td>
-                            </tr>
-                            <tr
-                                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3 font-mono text-gray-900 dark:text-white">qRsT9012uVwX</td>
-                                <td class="px-4 py-3">98</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3"><span
-                                        class="px-2 py-1 text-xs text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900/30 dark:text-yellow-400">Nearing
-                                        limit</span></td>
-                            </tr>
-                            <tr
-                                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3 font-mono text-gray-900 dark:text-white">yZaB3456cDeF</td>
-                                <td class="px-4 py-3">12</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3"><span
-                                        class="px-2 py-1 text-xs text-green-800 bg-green-100 rounded-full dark:bg-green-900/30 dark:text-green-400">OK</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                <td class="px-4 py-3 font-mono text-gray-900 dark:text-white">gHiJ7890kLmN</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3">100</td>
-                                <td class="px-4 py-3"><span
-                                        class="px-2 py-1 text-xs text-red-800 bg-red-100 rounded-full dark:bg-red-900/30 dark:text-red-400">Limit
-                                        reached</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div> --}}
+            <!-- New Email Table -->
+            <livewire:nawasara.pages.overview.section.new-email-card />
+
+            <!-- Token Usage Table -->
+            <livewire:nawasara.pages.overview.section.token-usage-card />
         </div>
 
         <!-- Table Section -->

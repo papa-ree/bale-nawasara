@@ -91,4 +91,9 @@ class PicContact extends Model
     {
         return $this->hasMany(DnsRecord::class);
     }
+
+    public function email(): HasMany
+    {
+        return $this->hasMany(EmailAccount::class);
+    }
 }

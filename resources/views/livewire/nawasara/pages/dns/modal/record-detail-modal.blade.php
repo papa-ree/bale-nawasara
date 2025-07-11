@@ -15,6 +15,7 @@ new class extends Component {
     public $monitorId;
 
     public $monitor;
+    public $subdomains = 'new';
 
     #[On('getMonitorSslStatus')]
     public function getMonitorSslStatus($monitorId)
@@ -101,6 +102,8 @@ new class extends Component {
             this.contactRecoveryEmail = null;
         },
         handlePermissionData(detail) {
+            $wire.$set('subdomains', detail.recordData.name);
+            console.log(detail.recordData.name);
             this.modalTitle = detail.modalTitle;
             this.recordId = detail.recordData.id;
             this.recordName = detail.recordData.name;
@@ -240,7 +243,8 @@ new class extends Component {
 
                     {{-- assign button --}}
                     <div class="" x-show="!contactName">
-                        <x-bale.secondary-button label="assign pic" class="justify-center w-full text-center" />
+                        <x-bale.button link href="{{ route('contacts.assign', $subdomains) }}" label="assign pic"
+                            class="justify-center w-full text-center" />
                     </div>
                 </div>
 

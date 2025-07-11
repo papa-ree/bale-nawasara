@@ -8,29 +8,39 @@ use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Paparee\BaleInv\App\Services\SatkerService;
+use Illuminate\Support\Str;
 
 title('Add Contact');
-state(['edit_mode' => false, 'contact', 'contact_name', 'contact_phone', 'contact_nip', 'contact_job', 'contact_office', 'recovery_email_address', 'use_recovery_email' => true, 'user_uuid', 'subdomains']);
+state(['edit_mode' => false, 'is_assign', 'assign_subdomain', 'contact', 'contact_name', 'contact_phone', 'contact_nip', 'contact_job', 'contact_office', 'recovery_email_address', 'use_recovery_email' => true, 'user_uuid', 'subdomains']);
 
 mount(function ($contact) {
+    // dump(Str::contains(url()->current(), 'assign'));
     if (!Auth::user()->can('contact update') && !Auth::user()->can('contact create')) {
         abort(403);
     }
 
-    $this->contact = PicContact::with('subdomains')->find($contact);
+    $this->is_assign = Str::contains(url()->current(), 'assign');
+
     $this->subdomains = [];
 
-    if ($this->contact) {
-        $this->edit_mode = true;
-        $this->contact_name = $this->contact->contact_name;
-        $this->contact_phone = $this->contact->contact_phone;
-        $this->contact_nip = $this->contact->contact_nip;
-        $this->recovery_email_address = $this->contact->recovery_email_address;
-        $this->use_recovery_email = $this->contact->recovery_email_address ?? false;
-        $this->contact_job = $this->contact->contact_job;
-        $this->contact_office = $this->contact->contact_office;
-        foreach ($this->contact->subdomains as $subdomain) {
-            array_push($this->subdomains, $subdomain->name);
+    if ($this->is_assign) {
+        array_push($this->subdomains, $contact);
+        // $this->subdomains = $contact;
+    } else {
+        $this->contact = PicContact::with('subdomains')->find($contact);
+
+        if ($this->contact) {
+            $this->edit_mode = true;
+            $this->contact_name = $this->contact->contact_name;
+            $this->contact_phone = $this->contact->contact_phone;
+            $this->contact_nip = $this->contact->contact_nip;
+            $this->recovery_email_address = $this->contact->recovery_email_address;
+            $this->use_recovery_email = $this->contact->recovery_email_address ?? false;
+            $this->contact_job = $this->contact->contact_job;
+            $this->contact_office = $this->contact->contact_office;
+            foreach ($this->contact->subdomains as $subdomain) {
+                array_push($this->subdomains, $subdomain->name);
+            }
         }
     }
 });
@@ -50,13 +60,13 @@ $availableRecords = computed(function () {
 });
 
 $availableLocations = computed(function () {
-    if (cache()->get('bale_inv_maps')) {
-        return cache()->get('bale_inv_maps', collect());
+    if (cache()->get('nawasara_instansi')) {
+        return cache()->get('nawasara_instansi', collect());
     } else {
         $satker = new SatkerService();
         $satker->getLocations();
 
-        return cache()->get('bale_inv_maps', collect());
+        return cache()->get('nawasara_instansi', collect());
     }
 });
 
@@ -96,10 +106,12 @@ $store = function (LivewireAlert $alert) {
         ]);
 
         foreach ($this->subdomains as $subdomain) {
-            DnsRecord::whereName($subdomain)->update(['pic_contact_id' => $contact->id]);
+            $subdomain_full = $subdomain . '.ponorogo.go.id';
+            DnsRecord::whereName($subdomain_full)->update(['pic_contact_id' => $contact->id]);
         }
 
         DB::commit();
+        $this->dispatch('refresh-dns-record-list');
         session()->flash('saved', [
             'title' => 'Contact Created',
         ]);
@@ -115,6 +127,7 @@ $store = function (LivewireAlert $alert) {
 };
 
 $update = function (LivewireAlert $alert) {
+    // dd($this);
     $this->authorize('contact update');
     $this->validate();
 
@@ -142,10 +155,12 @@ $update = function (LivewireAlert $alert) {
 
         // Perbarui subdomain yang dipilih
         foreach ($this->subdomains as $subdomain) {
-            DnsRecord::whereName($subdomain)->update(['pic_contact_id' => $this->contact->id]);
+            $subdomain_full = $subdomain . '.ponorogo.go.id';
+            DnsRecord::whereName($subdomain_full)->update(['pic_contact_id' => $this->contact->id]);
         }
 
         DB::commit();
+        $this->dispatch('refresh-dns-record-list');
         session()->flash('saved', [
             'title' => 'Contact Updated',
         ]);
@@ -231,8 +246,17 @@ $update = function (LivewireAlert $alert) {
                 </div>
             </div>
 
-            <div class="mb-4 sm:mb-6 lg:w-1/2">
-                <div wire:ignore>
+            <div class="mb-4 sm:mb-6 lg:w-1/2" x-data="{ isAssign: $wire.entangle('is_assign'), subdomain: $wire.entangle('subdomains') }">
+                @if ($this->is_assign)
+                    <div class="select-none" x-show="isAssign">
+                        <x-label value="subdomains" class="mb-2" />
+                        <span
+                            class="px-3 hover:bg-gray-300 transition py-1.5 items-center bg-gray-200 dark:bg-gray-700 rounded-md"
+                            x-text="subdomain">
+                        </span>
+                    </div>
+                @endif
+                <div wire:ignore x-show="!isAssign">
                     <x-label value="subdomains (optional)" />
                     <input name='tagify-subdomains' value="{{ json_encode($subdomains) }}"
                         class="block w-full px-3 py-2 text-sm border-gray-200 rounded-md focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"

@@ -11,14 +11,6 @@ class CloudflareService
 
     public function getDnsRecords()
     {
-        // $response = Http::withToken(config('bale-nawasara.cloudflare.api_token'))
-        //     ->get("{$this->baseUrl}/zones/" . config('bale-nawasara.cloudflare.zone_id') . "/dns_records");
-
-        // if ($response->successful()) {
-        //     $data = $response->json();
-        // }
-        // return $data;
-
         return Cache::remember('cloudflare_dns_records', now()->addMinutes(5), function () {
             $allRecords = [];
             $page = 1;

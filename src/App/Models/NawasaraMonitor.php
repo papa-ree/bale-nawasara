@@ -5,6 +5,7 @@ namespace Paparee\BaleNawasara\App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Spatie\UptimeMonitor\Models\Monitor;
+use Illuminate\Support\Str;
 
 class NawasaraMonitor extends Monitor
 {
@@ -13,6 +14,13 @@ class NawasaraMonitor extends Monitor
     protected $guarded = ['id'];
 
     protected $primaryKey = 'id';
+
+    protected function url(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => Str::remove('.ponorogo.go.id', $value),
+        );
+    }
 
     protected function uptimeLastCheckDate(): Attribute
     {

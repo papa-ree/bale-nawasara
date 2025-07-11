@@ -20,8 +20,7 @@ $availableTokens = computed(function () {
     $searchTerm = htmlspecialchars($this->query, ENT_QUOTES, 'UTF-8');
 
     return NawasaraAccessToken::where('name', 'like', '%' . $searchTerm . '%')
-        // ->whereNotIn('name', ['dev'])
-        // ->where('name', 'like', '%' . $searchTerm . '%')
+        ->whereNotIn('name', ['dev'])
         ->orderBy('name')
         ->paginate(100);
 });
