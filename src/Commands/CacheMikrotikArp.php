@@ -5,7 +5,7 @@ namespace Paparee\BaleNawasara\Commands;
 use Illuminate\Console\Command;
 use Paparee\BaleNawasara\App\Jobs\SyncMikrotikBgpJob;
 
-class CacheMikroTikArp extends Command
+class CacheMikrotikArp extends Command
 {
     protected $signature = 'nawasara:cache-arp';
 
@@ -17,7 +17,7 @@ class CacheMikroTikArp extends Command
             SyncMikrotikBgpJob::dispatch();
             $this->info('ARP list cached successfully.');
         } catch (\Throwable $e) {
-            $this->error('Failed to fetch ARP: '.$e->getMessage());
+            $this->error('Failed to fetch ARP: ' . $e->getMessage());
         }
     }
 }

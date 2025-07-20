@@ -2,7 +2,7 @@
 
 namespace Paparee\BaleNawasara;
 
-use Paparee\BaleNawasara\Commands\CacheMikroTikArp;
+use Paparee\BaleNawasara\Commands\CacheMikrotikArp;
 use Paparee\BaleNawasara\Commands\SendUptimeCheckFailedToWago;
 use Paparee\BaleNawasara\Commands\SyncDnsRecord;
 use Paparee\BaleNawasara\Commands\SyncEmailAccountCommand;
@@ -16,11 +16,11 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/bale-nawasara.php', 'bale-nawasara');
+        $this->mergeConfigFrom(__DIR__ . '/../config/bale-nawasara.php', 'bale-nawasara');
 
         $this->app->bind('command.nawasara:sync-dns-record', SyncDnsRecord::class);
         $this->app->bind('command.nawasara:uptime-failed-wago', SendUptimeCheckFailedToWago::class);
-        $this->app->bind('command.nawasara:cache-arp', CacheMikroTikArp::class);
+        $this->app->bind('command.nawasara:cache-arp', CacheMikrotikArp::class);
         $this->app->bind('command.nawasara:sync-email', SyncEmailAccountCommand::class);
         $this->app->bind('command.nawasara:update', UpdateNawasaraCommand::class);
         $this->app->bind('command.nawasara:update-view', UpdateNawasaraViewsCommand::class);
@@ -40,22 +40,22 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
+            __DIR__ . '/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
         ], 'bale-nawasara-migrations');
 
         // Config publish
         $this->publishes([
-            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
-            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
-            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
+            __DIR__ . '/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+            __DIR__ . '/../config/routeros-api.php' => config_path('routeros-api.php'),
+            __DIR__ . '/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
         ], 'bale-nawasara-config');
 
         $this->publishes([
-            __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
+            __DIR__ . '/../resources/views/livewire' => resource_path('views/livewire'),
         ], 'bale-nawasara-views');
 
         $this->publishes([
-            __DIR__.'/../resources/css' => resource_path('css'),
+            __DIR__ . '/../resources/css' => resource_path('css'),
         ], 'bale-nawasara-assets');
 
     }
