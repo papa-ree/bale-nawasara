@@ -25,10 +25,11 @@ class SyncMikrotikBgpJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(MikrotikService $mikroTik): void
+    public function handle(): void
     {
-        $arpList = $mikroTik->getArpList();
+        $mikrotik = new MikrotikService();
+        $arpList = $mikrotik->getArpList();
 
-        Cache::put('mikrotik_arp_list', $arpList, now()->addMinutes(config('bale-nawasara.mikrotik.cache_lifetime')));
+        Cache::put('mikrotik_arp_list', $arpList);
     }
 }

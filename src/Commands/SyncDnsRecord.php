@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Paparee\BaleNawasara\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -36,7 +36,7 @@ class SyncDnsRecord extends Command
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ])
-            ->post(env('WHATSAPP_GO_URL').'/send/message', [
+            ->post(env('WHATSAPP_GO_URL') . '/send/message', [
                 'phone' => '6285239146416@s.whatsapp.net',
                 'message' => 'DNS Record Sync Successfully',
             ]);
