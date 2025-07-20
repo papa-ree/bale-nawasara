@@ -2,6 +2,9 @@
 
 namespace Paparee\BaleNawasara;
 
+use Paparee\BaleNawasara\Commands\CacheMikroTikArp;
+use Paparee\BaleNawasara\Commands\SendUptimeCheckFailedToWago;
+use Paparee\BaleNawasara\Commands\SyncDnsRecord;
 use Paparee\BaleNawasara\Commands\SyncEmailAccountCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraMigrationsCommand;
@@ -15,12 +18,18 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/bale-nawasara.php', 'bale-nawasara');
 
+        $this->app->bind('command.nawasara:sync-dns-record', SyncDnsRecord::class);
+        $this->app->bind('command.nawasara:uptime-failed-wago', SendUptimeCheckFailedToWago::class);
+        $this->app->bind('command.nawasara:cache-arp', CacheMikroTikArp::class);
         $this->app->bind('command.nawasara:sync-email', SyncEmailAccountCommand::class);
         $this->app->bind('command.nawasara:update', UpdateNawasaraCommand::class);
         $this->app->bind('command.nawasara:update-view', UpdateNawasaraViewsCommand::class);
         $this->app->bind('command.nawasara:update-migration', UpdateNawasaraMigrationsCommand::class);
 
         $this->commands([
+            'command.nawasara:sync-dns-record',
+            'command.nawasara:uptime-failed-wago',
+            'command.nawasara:cache-arp',
             'command.nawasara:sync-email',
             'command.nawasara:update',
             'command.nawasara:update-view',
