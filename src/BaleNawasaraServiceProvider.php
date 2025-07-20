@@ -2,6 +2,9 @@
 
 namespace Paparee\BaleNawasara;
 
+use Paparee\BaleInv\Commands\UpdateNawasaraViewsCommand;
+use Paparee\BaleNawasara\Commands\UpdateNawasaraCommand;
+use Paparee\BaleNawasara\Commands\UpdateNawasaraMigrationsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -10,6 +13,16 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/bale-nawasara.php', 'bale-nawasara');
+
+        $this->app->bind('command.nawasara:update', UpdateNawasaraCommand::class);
+        $this->app->bind('command.nawasara:update-view', UpdateNawasaraViewsCommand::class);
+        $this->app->bind('command.nawasara:update-migration', UpdateNawasaraMigrationsCommand::class);
+
+        $this->commands([
+            'command.nawasara:update',
+            'command.nawasara:update-view',
+            'command.nawasara:update-migration',
+        ]);
     }
 
     public function boot()
