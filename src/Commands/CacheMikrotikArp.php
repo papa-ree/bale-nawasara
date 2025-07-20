@@ -17,7 +17,7 @@ class CacheMikroTikArp extends Command
             SyncMikrotikBgpJob::dispatch();
             $this->info('ARP list cached successfully.');
         } catch (\Throwable $e) {
-            $this->error('Failed to fetch ARP: ' . $e->getMessage());
+            $this->error('Failed to fetch ARP: '.$e->getMessage());
         }
     }
 }

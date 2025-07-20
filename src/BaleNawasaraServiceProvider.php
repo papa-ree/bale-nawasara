@@ -2,7 +2,7 @@
 
 namespace Paparee\BaleNawasara;
 
-use Paparee\BaleInv\Commands\UpdateNawasaraViewsCommand;
+use Paparee\BaleNawasara\Commands\UpdateNawasaraViewsCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraMigrationsCommand;
 use Spatie\LaravelPackageTools\Package;

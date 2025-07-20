@@ -44,13 +44,13 @@ class SendUptimeCheckFailedToWago extends Command
             $domain = $monitor->url ?? $monitor->dnsRecord->subdomain ?? 'tidak diketahui';
             $reason = $monitor->uptime_check_failure_reason ?? 'tidak diketahui';
 
-            return ($i + 1) . '. ' . $domain . "\nAlasan: " . $reason;
+            return ($i + 1).'. '.$domain."\nAlasan: ".$reason;
         })->implode("\n");
 
-        $message = "**🚨 Subdomain DOWN terdeteksi!**\n\n" .
-            'Jumlah Subdomain yang down: ' . $downMonitors->count() . "\n\n" .
-            "Berikut adalah daftar subdomain yang saat ini tidak dapat diakses:\n\n" .
-            $list . "\n\n" .
+        $message = "**🚨 Subdomain DOWN terdeteksi!**\n\n".
+            'Jumlah Subdomain yang down: '.$downMonitors->count()."\n\n".
+            "Berikut adalah daftar subdomain yang saat ini tidak dapat diakses:\n\n".
+            $list."\n\n".
             "_Mohon segera dicek dan ditindaklanjuti._\n\n*Pesan ini dikirim melalui Nawasara*";
 
         try {
@@ -61,8 +61,8 @@ class SendUptimeCheckFailedToWago extends Command
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
                     ])
-                    ->post(env('WHATSAPP_GO_URL') . '/send/message', [
-                        'phone' => $phone . '@s.whatsapp.net',
+                    ->post(env('WHATSAPP_GO_URL').'/send/message', [
+                        'phone' => $phone.'@s.whatsapp.net',
                         // 'phone' => '120363402962373513' . '@g.us', //CF cloudflare
                         'message' => $message,
                     ]);
@@ -72,8 +72,8 @@ class SendUptimeCheckFailedToWago extends Command
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
                     ])
-                    ->post(env('WHATSAPP_GO_URL') . '/send/message', [
-                        'phone' => $group . '@g.us', // CF cloudflare
+                    ->post(env('WHATSAPP_GO_URL').'/send/message', [
+                        'phone' => $group.'@g.us', // CF cloudflare
                         'message' => $message,
                     ]);
             } else {
@@ -82,8 +82,8 @@ class SendUptimeCheckFailedToWago extends Command
                         'Accept' => 'application/json',
                         'Content-Type' => 'application/json',
                     ])
-                    ->post(env('WHATSAPP_GO_URL') . '/send/message', [
-                        'phone' => '62895709700900' . '@s.whatsapp.net',
+                    ->post(env('WHATSAPP_GO_URL').'/send/message', [
+                        'phone' => '62895709700900'.'@s.whatsapp.net',
                         // 'phone' => '120363402962373513' . '@g.us', //CF cloudflare
                         'message' => $message,
                     ]);
@@ -92,10 +92,10 @@ class SendUptimeCheckFailedToWago extends Command
             if ($response->successful()) {
                 $this->info('📤 Pesan berhasil dikirim ke admin via WhatsApp.');
             } else {
-                $this->error('❌ Gagal mengirim pesan. Status: ' . $response->status());
+                $this->error('❌ Gagal mengirim pesan. Status: '.$response->status());
             }
         } catch (\Exception $e) {
-            $this->error('❌ Terjadi error saat mengirim pesan: ' . $e->getMessage());
+            $this->error('❌ Terjadi error saat mengirim pesan: '.$e->getMessage());
         }
 
         return Command::SUCCESS;
