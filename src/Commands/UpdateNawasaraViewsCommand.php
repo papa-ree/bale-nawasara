@@ -1,6 +1,6 @@
 <?php
 
-namespace Paparee\BaleInv\Commands;
+namespace Paparee\BaleNawasara\Commands;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Attribute\AsCommand;
