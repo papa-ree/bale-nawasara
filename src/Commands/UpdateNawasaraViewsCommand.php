@@ -9,6 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 class UpdateNawasaraViewsCommand extends Command
 {
     protected $signature = 'nawasara:update-view';
+
     protected $description = 'Force update bale-nawasara views from vendor';
 
     public function handle()
