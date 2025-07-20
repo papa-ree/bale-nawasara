@@ -4,8 +4,8 @@ namespace Paparee\BaleNawasara\App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Spatie\UptimeMonitor\Models\Monitor;
 use Illuminate\Support\Str;
+use Spatie\UptimeMonitor\Models\Monitor;
 
 class NawasaraMonitor extends Monitor
 {

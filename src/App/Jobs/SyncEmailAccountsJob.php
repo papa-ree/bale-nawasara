@@ -22,7 +22,7 @@ class SyncEmailAccountsJob implements ShouldQueue
 
     public function handle()
     {
-        $cp = new CpanelEmailService();
+        $cp = new CpanelEmailService;
         $accounts = $cp->getEmailAccounts();
 
         Cache::put('email_sync_timestamp', now());

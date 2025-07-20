@@ -37,7 +37,7 @@ class GenerateNawasaraSummaryJob implements ShouldQueue
         $monitor = new NawasaraMonitor;
         $dns_sync_timestamp = cache()->get('dns_sync_timestamp') ?? now();
         $wago_hit_today = new NawasaraTokenDailyHit;
-        $email = new EmailAccount();
+        $email = new EmailAccount;
         $email_sync_timestamp = cache()->get('email_sync_timestamp') ?? now();
 
         Cache::put('nawasara_summary', [

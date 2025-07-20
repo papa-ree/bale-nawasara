@@ -1,13 +1,17 @@
 <?php
 
 namespace Paparee\BaleNawasara\App\Services;
+
 use Illuminate\Support\Facades\Http;
 
 class CpanelEmailService
 {
     protected $baseUrl;
+
     protected $token;
+
     protected $cpanelUser;
+
     protected $domain;
 
     public function __construct()
@@ -21,7 +25,7 @@ class CpanelEmailService
     public function getEmailAccounts()
     {
         $response = Http::withHeaders([
-            'Authorization' => "cpanel {$this->cpanelUser}:{$this->token}"
+            'Authorization' => "cpanel {$this->cpanelUser}:{$this->token}",
         ])->get("{$this->baseUrl}/execute/Email/list_pops", [
             'domain' => $this->domain,
         ]);
@@ -34,15 +38,14 @@ class CpanelEmailService
         $user = explode('@ponorogo.go.id', $email)[0];
 
         $response = Http::withHeaders([
-            'Authorization' => "cpanel {$this->cpanelUser}:{$this->token}"
+            'Authorization' => "cpanel {$this->cpanelUser}:{$this->token}",
         ])->post("{$this->baseUrl}/execute/Email/add_pop", [
             'email' => $user,
             'domain' => $this->domain,
             'password' => $password,
-            'quota' => $quotaMB
+            'quota' => $quotaMB,
         ]);
 
         return $response->json();
     }
-
 }

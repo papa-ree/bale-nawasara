@@ -10,7 +10,7 @@ return [
     'mikrotik' => [
         'cache_lifetime' => 60,
     ],
-    
+
     'whatsapp' => [
         'secret' => env('WHATSAPP_WEBHOOK_SECRET'),
     ],
