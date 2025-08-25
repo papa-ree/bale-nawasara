@@ -24,13 +24,11 @@ class SyncKumaIpCommand extends Command
             return;
         }
 
-        $delaySeconds = 0; // mulai dari 0 detik
+        $monitors->each(function ($monitor, $index): void {
+            // jeda 5 detik per urutan
+            $delay = now()->addSeconds($index * 5);
 
-        $monitors->each(function ($monitor) use (&$delaySeconds): void {
-            // kasih delay berjenjang, misalnya tiap monitor 5 detik
-            SyncKumaJob::dispatch($monitor->id)->delay(now()->addSeconds($delaySeconds));
-
-            $delaySeconds += 5; // jeda 5 detik antar job
+            SyncKumaJob::dispatch($monitor->id)->delay($delay);
         });
 
         $this->info("Dispatched {$monitors->count()} Kuma monitor jobs to queue.");
