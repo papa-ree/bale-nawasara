@@ -21,12 +21,16 @@ class SyncKumaIpCommand extends Command
 
         if ($monitors->isEmpty()) {
             $this->warn('No unsynced Kuma monitors found.');
-
             return;
         }
 
-        $monitors->each(function ($monitor): void {
-            SyncKumaJob::dispatch($monitor->id);
+        $delaySeconds = 0; // mulai dari 0 detik
+
+        $monitors->each(function ($monitor) use (&$delaySeconds): void {
+            // kasih delay berjenjang, misalnya tiap monitor 5 detik
+            SyncKumaJob::dispatch($monitor->id)->delay(now()->addSeconds($delaySeconds));
+
+            $delaySeconds += 3; // jeda 3 detik antar job
         });
 
         $this->info("Dispatched {$monitors->count()} Kuma monitor jobs to queue.");
