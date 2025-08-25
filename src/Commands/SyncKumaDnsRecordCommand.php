@@ -9,6 +9,7 @@ use Paparee\BaleNawasara\App\Models\KumaMonitor;
 class SyncKumaDnsRecordCommand extends Command
 {
     protected $signature = 'nawasara:sync-dns-kuma';
+
     protected $description = 'Sync Kuma Monitors DNS Record (type http) to Kuma';
 
     public function handle()
@@ -20,6 +21,7 @@ class SyncKumaDnsRecordCommand extends Command
 
         if ($monitors->isEmpty()) {
             $this->warn('No unsynced Kuma monitors found.');
+
             return;
         }
 

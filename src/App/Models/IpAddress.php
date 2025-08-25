@@ -19,5 +19,4 @@ class IpAddress extends Model
         // ip_addresses.address → kuma_monitors.hostname
         return $this->hasOne(KumaMonitor::class);
     }
-
 }

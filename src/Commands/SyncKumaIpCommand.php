@@ -9,6 +9,7 @@ use Paparee\BaleNawasara\App\Models\KumaMonitor;
 class SyncKumaIpCommand extends Command
 {
     protected $signature = 'nawasara:sync-ip-kuma';
+
     protected $description = 'Sync Kuma Monitors IP (type ping) to Kuma';
 
     public function handle()
@@ -20,6 +21,7 @@ class SyncKumaIpCommand extends Command
 
         if ($monitors->isEmpty()) {
             $this->warn('No unsynced Kuma monitors found.');
+
             return;
         }
 

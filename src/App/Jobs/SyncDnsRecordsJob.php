@@ -63,7 +63,7 @@ class SyncDnsRecordsJob implements ShouldQueue
                 //         'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
                 //     ]
                 // );
-                $kuma_monitor = new DnsRecordMonitorService();
+                $kuma_monitor = new DnsRecordMonitorService;
                 $kuma_monitor->sendDnsRecordToMonitor($record['id'], $record['name']);
             }
         }

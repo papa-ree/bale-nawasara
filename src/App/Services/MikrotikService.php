@@ -4,8 +4,6 @@ namespace Paparee\BaleNawasara\App\Services;
 
 use RouterOS\Client;
 use RouterOS\Query;
-use Illuminate\Support\Arr;
-use Paparee\BaleNawasara\App\Models\IpAddress;
 
 class MikrotikService
 {
@@ -30,6 +28,7 @@ class MikrotikService
     {
         try {
             $query = new Query('/ip/address/print');
+
             return $this->client->query($query)->read();
 
             // return ['ok' => true, 'count' => count($response), "data" => $response];
@@ -51,6 +50,7 @@ class MikrotikService
         $arpList = array_map(function ($item) {
             $item['mac_address'] = $item['mac-address'] ?? null;
             unset($item['mac-address']);
+
             return $item;
         }, $arpList);
 
@@ -67,7 +67,7 @@ class MikrotikService
             $ipLong = ip2long($item['address']);
 
             foreach ($addressList as $address) {
-                if (!isset($address['address'])) {
+                if (! isset($address['address'])) {
                     continue;
                 }
 
@@ -95,12 +95,11 @@ class MikrotikService
         return $arpList;
     }
 
-
     /**
      * Update comment pada ARP entry
      *
-     * @param string $arpId ID dari ARP (bisa didapat dari getArpList)
-     * @param string $comment Komentar baru
+     * @param  string  $arpId  ID dari ARP (bisa didapat dari getArpList)
+     * @param  string  $comment  Komentar baru
      */
     public function updateArpComment(string $arpId, $comment): bool
     {
@@ -110,9 +109,11 @@ class MikrotikService
                 ->equal('comment', $comment);
 
             $this->client->query($query)->read();
+
             return true;
         } catch (\Throwable $e) {
             info($e->getMessage());
+
             return false;
         }
     }
@@ -120,7 +121,7 @@ class MikrotikService
     /**
      * Jadikan IP address static pada ARP entry
      *
-     * @param string $arpId ID dari ARP
+     * @param  string  $arpId  ID dari ARP
      */
     public function makeStaticArp(string $arpId, ?string $comment = null): bool
     {
@@ -140,8 +141,8 @@ class MikrotikService
             $existingComment = $entry['comment'] ?? '';
 
             // 2. Jika sudah static dan comment berbeda → update comment saja
-            if (!$isDynamic) {
-                if (!empty($comment) && $comment !== $existingComment) {
+            if (! $isDynamic) {
+                if (! empty($comment) && $comment !== $existingComment) {
                     $querySet = (new Query('/ip/arp/set'))
                         ->equal('.id', $arpId)
                         ->equal('comment', $comment);
@@ -162,11 +163,11 @@ class MikrotikService
                 ->equal('interface', $entry['interface']);
 
             // Gunakan MAC address palsu jika tidak ada comment
-            $mac = (!empty($comment)) ? $entry['mac-address'] : '00:00:00:00:00:00';
+            $mac = (! empty($comment)) ? $entry['mac-address'] : '00:00:00:00:00:00';
             $queryAdd->equal('mac-address', $mac);
 
             // Tambahkan comment jika ada
-            if (!empty($comment)) {
+            if (! empty($comment)) {
                 $queryAdd->equal('comment', $comment);
             }
 
@@ -198,7 +199,7 @@ class MikrotikService
             return true;
         } catch (\Exception $e) {
             // Log error jika perlu
-            info('Mikrotik ARP error: ' . $e->getMessage());
+            info('Mikrotik ARP error: '.$e->getMessage());
 
             return false;
         }
@@ -277,7 +278,6 @@ class MikrotikService
     //     // ],
     // }
 
-
     // public function generateIpAddressGroups(): void
     // {
     //     $arpList = collect(cache()->get('mikrotik_arp_list', []));
@@ -317,7 +317,6 @@ class MikrotikService
     //     cache()->put('mikrotik_address_group_list', $groups);
     // }
 
-
     public function calculateIpHostRange(): array
     {
         $addressList = cache()->get('mikrotik_address_list', []);
@@ -326,15 +325,17 @@ class MikrotikService
         $result = [];
 
         foreach ($addressList as $entry) {
-            if (!isset($entry['address']))
+            if (! isset($entry['address'])) {
                 continue;
+            }
 
             [$ip, $cidr] = explode('/', $entry['address']);
             $cidr = (int) $cidr;
 
             // Skip invalid CIDR
-            if ($cidr < 0 || $cidr > 32)
+            if ($cidr < 0 || $cidr > 32) {
                 continue;
+            }
 
             $ipLong = ip2long($ip);
             $netmask = -1 << (32 - $cidr);
@@ -349,6 +350,7 @@ class MikrotikService
                 ->pluck('address')
                 ->filter(function ($hostIp) use ($network, $broadcast) {
                     $long = ip2long($hostIp);
+
                     return $long >= ($network + 1) && $long <= ($broadcast - 1);
                 })->count();
 
@@ -358,7 +360,7 @@ class MikrotikService
                 'address' => $entry['address'],
                 'network' => long2ip($network),
                 'broadcast' => long2ip($broadcast),
-                'range' => long2ip($network + 1) . ' - ' . long2ip($broadcast - 1),
+                'range' => long2ip($network + 1).' - '.long2ip($broadcast - 1),
                 'max_host' => $maxHost,
                 'used_host' => $usedHost,
                 'free_host' => $freeHost,

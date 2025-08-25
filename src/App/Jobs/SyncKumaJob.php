@@ -13,25 +13,27 @@ use Paparee\BaleNawasara\App\Services\KumaProxyService;
 class SyncKumaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     protected string $ip;
+
     protected ?string $name;
+
     protected $tags;
+
     protected $notification_id_List;
 
-    public function __construct(public string $monitorId)
-    {
-    }
+    public function __construct(public string $monitorId) {}
 
     public function handle(KumaProxyService $kumaProxy): void
     {
         $monitor = KumaMonitor::find($this->monitorId);
 
-        if (!$monitor) {
+        if (! $monitor) {
             logger()->warning("SyncKumaJob: Monitor {$this->monitorId} not found.");
+
             return;
         }
 
         $kumaProxy->addPingMonitor($monitor);
     }
-
 }

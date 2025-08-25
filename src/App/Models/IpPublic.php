@@ -3,7 +3,6 @@
 namespace Paparee\BaleNawasara\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class IpPublic extends Model
