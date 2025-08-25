@@ -21,6 +21,7 @@ class SyncKumaIpCommand extends Command
 
         if ($monitors->isEmpty()) {
             $this->warn('No unsynced Kuma monitors found.');
+
             return;
         }
 
