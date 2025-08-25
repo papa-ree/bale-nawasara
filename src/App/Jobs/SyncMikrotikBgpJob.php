@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Paparee\BaleNawasara\App\Models\IpAddress;
 use Paparee\BaleNawasara\App\Models\IpPublic;
-use Paparee\BaleNawasara\App\Models\KumaMonitor;
 use Paparee\BaleNawasara\App\Services\IpAddressMonitorService;
 use Paparee\BaleNawasara\App\Services\MikrotikService;
 
@@ -85,7 +84,7 @@ class SyncMikrotikBgpJob implements ShouldQueue
                 );
 
                 // send ip arp to table kuma_monitor
-                $kuma_monitor = new IpAddressMonitorService();
+                $kuma_monitor = new IpAddressMonitorService;
                 $kuma_monitor->sendIpToMonitor($item['.id'], $item['address'], $item['comment'] ?? $item['address']);
 
             }
@@ -98,18 +97,19 @@ class SyncMikrotikBgpJob implements ShouldQueue
             // Cek apakah error adalah timeout
             if (str_contains($e->getMessage(), 'timed out') || str_contains($e->getMessage(), 'Stream timed out')) {
                 Log::warning('[SyncMikrotikBgpJob] Timeout error: retrying job...', [
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
                 ]);
 
                 // Re-dispatch ulang job agar dijalankan ulang
                 self::dispatch()->delay(now()->addSeconds(10)); // retry after 10 seconds
+
                 return;
             }
 
             // Log general exception
             Log::error('[SyncMikrotikBgpJob] Failed to sync due to error', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             throw $e; // re-throw jika error selain timeout

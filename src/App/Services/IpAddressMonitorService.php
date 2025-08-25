@@ -3,7 +3,6 @@
 namespace Paparee\BaleNawasara\App\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
 use Paparee\BaleNawasara\App\Models\KumaMonitor;
 
 class IpAddressMonitorService
@@ -16,15 +15,16 @@ class IpAddressMonitorService
         // Ambil dari cache
         $arpList = Cache::get('mikrotik_arp_list', []);
 
-        if (empty($arpList) || !is_array($arpList)) {
+        if (empty($arpList) || ! is_array($arpList)) {
             logger()->warning('IpAddressMonitorService: mikrotik_arp_list kosong atau invalid.');
+
             return;
         }
 
         foreach ($arpList as $arp) {
             $address = $arp['address'] ?? null;
 
-            if (!$address) {
+            if (! $address) {
                 continue; // skip jika tidak ada IP
             }
 

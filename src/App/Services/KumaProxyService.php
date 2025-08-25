@@ -13,7 +13,7 @@ class KumaProxyService
         try {
 
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . '/add-monitor', [
+                ->post(config('bale-nawasara.kuma_proxy.url').'/add-monitor', [
                     'name' => $monitor->name,
                     'url' => $monitor->url,
                     'hostname' => $monitor->hostname,
@@ -24,7 +24,7 @@ class KumaProxyService
                     'expiryNotification' => $monitor->expiry_notification,
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to add monitor',
@@ -48,7 +48,7 @@ class KumaProxyService
 
             return $json ?? [
                 'ok' => false,
-                'msg' => 'Invalid JSON response from Kuma proxy'
+                'msg' => 'Invalid JSON response from Kuma proxy',
             ];
         } catch (\Throwable $th) {
             return [
@@ -63,9 +63,9 @@ class KumaProxyService
     {
         try {
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->get(config('bale-nawasara.kuma_proxy.url') . '/get-tags');
+                ->get(config('bale-nawasara.kuma_proxy.url').'/get-tags');
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to fetch tags',
@@ -92,5 +92,4 @@ class KumaProxyService
             ];
         }
     }
-
 }
