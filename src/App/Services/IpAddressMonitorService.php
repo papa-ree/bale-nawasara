@@ -15,7 +15,7 @@ class IpAddressMonitorService
         // Ambil dari cache
         $arpList = Cache::get('mikrotik_arp_list', []);
 
-        if (empty($arpList) || ! is_array($arpList)) {
+        if (empty($arpList) || !is_array($arpList)) {
             logger()->warning('IpAddressMonitorService: mikrotik_arp_list kosong atau invalid.');
 
             return;
@@ -24,25 +24,19 @@ class IpAddressMonitorService
         foreach ($arpList as $arp) {
             $address = $arp['address'] ?? null;
 
-            if (! $address) {
+            if (!$address) {
                 continue; // skip jika tidak ada IP
             }
 
             // Cek apakah sudah ada di database
             KumaMonitor::updateOrCreate(
-                ['hostname' => $address], // unique
+                [
+                    'hostname' => $address,
+                    'url' => $address
+                ], // unique
                 [
                     'name' => $arp['comment'] ?? $address,
                     'type' => 'ping',
-                    'url' => null, // untuk ping, biasanya pakai hostname saja
-                    'method' => null,
-                    'active' => 1,
-                    'timeout' => 48,
-                    'interval' => 60,
-                    'retry_interval' => 60,
-                    'resend_interval' => 0,
-                    'expiry_notification' => 0,
-                    'uptime_check_enabled' => 0,
                     'tags' => [1],
                     'notification_id_list' => [1, 2],
                 ]
@@ -62,14 +56,6 @@ class IpAddressMonitorService
                 'type' => 'ping',
                 'url' => $address,
                 'hostname' => $address,
-                'method' => null,
-                'active' => 1,
-                'timeout' => 48,
-                'interval' => 60,
-                'retry_interval' => 60,
-                'resend_interval' => 0,
-                'expiry_notification' => 0,
-                'uptime_check_enabled' => 0,
                 'tags' => [1],
                 'notification_id_list' => [1, 2],
             ]
