@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
+use Paparee\BaleNawasara\App\Services\DnsRecordMonitorService;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -52,16 +53,18 @@ class SyncDnsRecordsJob implements ShouldQueue
             );
 
             if ($record['type'] === 'A') {
-                NawasaraMonitor::updateOrCreate(
-                    ['dns_record_id' => $record['id']],
-                    [
-                        'url' => 'https://'.$record['name'],
-                        'look_for_string' => '',
-                        'uptime_check_method' => 'get',
-                        'certificate_check_enabled' => true,
-                        'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
-                    ]
-                );
+                // NawasaraMonitor::updateOrCreate(
+                //     ['dns_record_id' => $record['id']],
+                //     [
+                //         'url' => 'https://'.$record['name'],
+                //         'look_for_string' => '',
+                //         'uptime_check_method' => 'get',
+                //         'certificate_check_enabled' => true,
+                //         'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
+                //     ]
+                // );
+                $kuma_monitor = new DnsRecordMonitorService();
+                $kuma_monitor->sendDnsRecordToMonitor($record['id'], $record['name']);
             }
         }
 

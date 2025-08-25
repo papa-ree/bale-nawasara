@@ -2,10 +2,13 @@
 
 namespace Paparee\BaleNawasara;
 
+use Paparee\BaleNawasara\Commands\CacheMikrotikAddressCommand;
 use Paparee\BaleNawasara\Commands\CacheMikrotikArp;
 use Paparee\BaleNawasara\Commands\SendUptimeCheckFailedToWago;
 use Paparee\BaleNawasara\Commands\SyncDnsRecord;
 use Paparee\BaleNawasara\Commands\SyncEmailAccountCommand;
+use Paparee\BaleNawasara\Commands\SyncKumaDnsRecordCommand;
+use Paparee\BaleNawasara\Commands\SyncKumaIpCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraMigrationsCommand;
 use Paparee\BaleNawasara\Commands\UpdateNawasaraViewsCommand;
@@ -16,12 +19,15 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/bale-nawasara.php', 'bale-nawasara');
+        $this->mergeConfigFrom(__DIR__ . '/../config/bale-nawasara.php', 'bale-nawasara');
 
         $this->app->bind('command.nawasara:sync-dns-record', SyncDnsRecord::class);
         $this->app->bind('command.nawasara:uptime-failed-wago', SendUptimeCheckFailedToWago::class);
         $this->app->bind('command.nawasara:cache-arp', CacheMikrotikArp::class);
+        $this->app->bind('command.nawasara:cache-address', CacheMikrotikAddressCommand::class);
         $this->app->bind('command.nawasara:sync-email', SyncEmailAccountCommand::class);
+        $this->app->bind('command.nawasara:sync-ip-kuma', SyncKumaIpCommand::class);
+        $this->app->bind('command.nawasara:sync-dns-kuma', SyncKumaDnsRecordCommand::class);
         $this->app->bind('command.nawasara:update', UpdateNawasaraCommand::class);
         $this->app->bind('command.nawasara:update-view', UpdateNawasaraViewsCommand::class);
         $this->app->bind('command.nawasara:update-migration', UpdateNawasaraMigrationsCommand::class);
@@ -30,7 +36,10 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             'command.nawasara:sync-dns-record',
             'command.nawasara:uptime-failed-wago',
             'command.nawasara:cache-arp',
+            'command.nawasara:cache-address',
             'command.nawasara:sync-email',
+            'command.nawasara:sync-ip-kuma',
+            'command.nawasara:sync-dns-kuma',
             'command.nawasara:update',
             'command.nawasara:update-view',
             'command.nawasara:update-migration',
@@ -40,22 +49,22 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
+            __DIR__ . '/../database/migrations/nawasara' => base_path('database/migrations/nawasara'),
         ], 'bale-nawasara-migrations');
 
         // Config publish
         $this->publishes([
-            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
-            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
-            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
+            __DIR__ . '/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+            __DIR__ . '/../config/routeros-api.php' => config_path('routeros-api.php'),
+            __DIR__ . '/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
         ], 'bale-nawasara-config');
 
         $this->publishes([
-            __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
+            __DIR__ . '/../resources/views/livewire' => resource_path('views/livewire'),
         ], 'bale-nawasara-views');
 
         $this->publishes([
-            __DIR__.'/../resources/css' => resource_path('css'),
+            __DIR__ . '/../resources/css' => resource_path('css'),
         ], 'bale-nawasara-assets');
 
     }

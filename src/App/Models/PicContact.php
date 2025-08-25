@@ -92,10 +92,10 @@ class PicContact extends Model
         return $this->hasMany(DnsRecord::class);
     }
 
-    public function ipPublics(): HasMany
-    {
-        return $this->hasMany(IpPublic::class);
-    }
+    // public function ipPublics(): HasMany
+    // {
+    //     return $this->hasMany(IpPublic::class);
+    // }
 
     public function email(): HasMany
     {

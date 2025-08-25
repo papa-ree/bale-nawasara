@@ -26,4 +26,9 @@ return [
         'domain' => env('CPANEL_DOMAIN'),
     ],
 
+    'kuma_proxy' => [
+        'url' => env('KUMA_PROXY_URL', 'https://localhost:6000'),
+        'token' => env('KUMA_PROXY_TOKEN'),
+    ],
+
 ];

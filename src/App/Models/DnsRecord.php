@@ -46,27 +46,33 @@ class DnsRecord extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Str::remove('.ponorogo.go.id', $value),
+            get: fn(string $value) => Str::remove('.ponorogo.go.id', $value),
         );
     }
 
     protected function content(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Str::remove('"', Str::limit($value, 20, '')),
+            get: fn(string $value) => Str::remove('"', Str::limit($value, 20, '')),
         );
     }
 
     protected function createdOn(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Carbon::parse($value)->diffForHumans(),
+            get: fn(string $value) => Carbon::parse($value)->diffForHumans(),
         );
     }
 
+    // public function monitor()
+    // {
+    //     return $this->hasOne(NawasaraMonitor::class);
+    // }
+
     public function monitor()
     {
-        return $this->hasOne(NawasaraMonitor::class);
+        // ip_addresses.address → kuma_monitors.hostname
+        return $this->hasOne(KumaMonitor::class, );
     }
 
     public function contact(): BelongsTo
