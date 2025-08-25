@@ -27,6 +27,6 @@ class UpdateNawasaraCommand extends Command
             '--force' => true,
         ]);
 
-        $this->info('Bale iNV updated successfully.');
+        $this->info('Bale Nawasara updated successfully.');
     }
 }
