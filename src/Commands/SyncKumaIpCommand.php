@@ -30,7 +30,7 @@ class SyncKumaIpCommand extends Command
             // kasih delay berjenjang, misalnya tiap monitor 5 detik
             SyncKumaJob::dispatch($monitor->id)->delay(now()->addSeconds($delaySeconds));
 
-            $delaySeconds += 3; // jeda 3 detik antar job
+            $delaySeconds += 5; // jeda 5 detik antar job
         });
 
         $this->info("Dispatched {$monitors->count()} Kuma monitor jobs to queue.");
