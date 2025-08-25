@@ -19,7 +19,6 @@
         "php": "^8.2",
         "spatie/laravel-package-tools": "^1.16",
         "illuminate/contracts": "^10.0||^11.0||^12.0",
-        "paparee/bale-cms": "*",
         "evilfreelancer/routeros-api-php": "*",
         "spatie/laravel-uptime-monitor": "*"
     },
