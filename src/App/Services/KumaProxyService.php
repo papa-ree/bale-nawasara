@@ -15,7 +15,7 @@ class KumaProxyService
         try {
 
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . '/add-monitor', [
+                ->post(config('bale-nawasara.kuma_proxy.url').'/add-monitor', [
                     'name' => $monitor->name,
                     'url' => $monitor->url,
                     'hostname' => $monitor->hostname,
@@ -26,7 +26,7 @@ class KumaProxyService
                     'expiryNotification' => $monitor->expiry_notification,
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to add monitor',
@@ -66,7 +66,7 @@ class KumaProxyService
         try {
 
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . '/update-monitor', [
+                ->post(config('bale-nawasara.kuma_proxy.url').'/update-monitor', [
                     'id_' => $monitor->kuma_id,
                     'name' => $monitor->name,
                     'url' => $monitor->url,
@@ -83,7 +83,7 @@ class KumaProxyService
                     'expiryNotification' => $monitor->expiry_notification,
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to add monitor',
@@ -120,13 +120,13 @@ class KumaProxyService
         try {
 
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . '/update-monitor-name', [
+                ->post(config('bale-nawasara.kuma_proxy.url').'/update-monitor-name', [
                     'id_' => $monitor->kuma_id,
                     'name' => $monitor->name,
                     'kuma_synced' => true,
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to update monitor name',
@@ -160,9 +160,9 @@ class KumaProxyService
     {
         try {
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->get(config('bale-nawasara.kuma_proxy.url') . '/get-tags');
+                ->get(config('bale-nawasara.kuma_proxy.url').'/get-tags');
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to fetch tags',
@@ -194,9 +194,9 @@ class KumaProxyService
     {
         try {
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->get(config('bale-nawasara.kuma_proxy.url') . '/get-monitors');
+                ->get(config('bale-nawasara.kuma_proxy.url').'/get-monitors');
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return [
                     'ok' => false,
                     'msg' => 'Failed to fetch monitors',
@@ -257,10 +257,11 @@ class KumaProxyService
     {
         try {
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . "/delete-monitor/{$monitor->kuma_id}");
+                ->post(config('bale-nawasara.kuma_proxy.url')."/delete-monitor/{$monitor->kuma_id}");
 
             if ($response->successful()) {
                 Log::info("[KumaProxyService] Monitor {$monitor->kuma_id} deleted from Kuma Proxy");
+
                 return true;
             }
 
@@ -274,6 +275,7 @@ class KumaProxyService
             Log::error("[KumaProxyService] Exception deleting monitor {$monitor->kuma_id}", [
                 'message' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -282,10 +284,11 @@ class KumaProxyService
     {
         try {
             $response = Http::withToken(config('bale-nawasara.kuma_proxy.token'))
-                ->post(config('bale-nawasara.kuma_proxy.url') . "/delete-monitor/{$id}");
+                ->post(config('bale-nawasara.kuma_proxy.url')."/delete-monitor/{$id}");
 
             if ($response->successful()) {
                 Log::info("[KumaProxyService] Monitor {$id} deleted from Kuma Proxy");
+
                 return true;
             }
 
@@ -299,6 +302,7 @@ class KumaProxyService
             Log::error("[KumaProxyService] Exception deleting monitor {$id}", [
                 'message' => $e->getMessage(),
             ]);
+
             return false;
         }
     }

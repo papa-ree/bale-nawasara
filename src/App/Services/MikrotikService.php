@@ -4,7 +4,6 @@ namespace Paparee\BaleNawasara\App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Jobs\SyncMikrotikBgpJob;
-use Paparee\BaleNawasara\App\Models\IpPublic;
 use RouterOS\Client;
 use RouterOS\Query;
 
@@ -72,7 +71,7 @@ class MikrotikService
             $ipLong = ip2long($item['address']);
 
             foreach ($addressList as $address) {
-                if (!isset($address['address'])) {
+                if (! isset($address['address'])) {
                     continue;
                 }
 
@@ -102,7 +101,6 @@ class MikrotikService
 
         return $arpList;
     }
-
 
     /**
      * Update comment pada ARP entry
@@ -145,8 +143,8 @@ class MikrotikService
             $existingComment = $entry['comment'] ?? '';
 
             // 2. Jika sudah static dan comment berbeda → update comment saja
-            if (!$isDynamic) {
-                if (!empty($comment) && $comment !== $existingComment) {
+            if (! $isDynamic) {
+                if (! empty($comment) && $comment !== $existingComment) {
                     $querySet = (new Query('/ip/arp/set'))
                         ->equal('.id', $arpId)
                         ->equal('comment', $comment);
@@ -167,11 +165,11 @@ class MikrotikService
                 ->equal('interface', $entry['interface']);
 
             // Pakai MAC jika ada, kalau tidak fallback ke 00
-            $mac = !empty($entry['mac-address']) ? $entry['mac-address'] : '00:00:00:00:00:00';
+            $mac = ! empty($entry['mac-address']) ? $entry['mac-address'] : '00:00:00:00:00:00';
             $queryAdd->equal('mac-address', $mac);
 
             // Tambahkan comment jika ada
-            if (!empty($comment)) {
+            if (! empty($comment)) {
                 $queryAdd->equal('comment', $comment);
             }
 
@@ -184,7 +182,6 @@ class MikrotikService
             return false;
         }
     }
-
 
     public function removeArpEntry(string $arpId): bool
     {
@@ -208,7 +205,7 @@ class MikrotikService
             return true;
         } catch (\Exception $e) {
             // Log error jika perlu
-            info('Mikrotik ARP error: ' . $e->getMessage());
+            info('Mikrotik ARP error: '.$e->getMessage());
 
             return false;
         }
@@ -334,7 +331,7 @@ class MikrotikService
         $result = [];
 
         foreach ($addressList as $entry) {
-            if (!isset($entry['address'])) {
+            if (! isset($entry['address'])) {
                 continue;
             }
 
@@ -369,7 +366,7 @@ class MikrotikService
                 'address' => $entry['address'],
                 'network' => long2ip($network),
                 'broadcast' => long2ip($broadcast),
-                'range' => long2ip($network + 1) . ' - ' . long2ip($broadcast - 1),
+                'range' => long2ip($network + 1).' - '.long2ip($broadcast - 1),
                 'max_host' => $maxHost,
                 'used_host' => $usedHost,
                 'free_host' => $freeHost,

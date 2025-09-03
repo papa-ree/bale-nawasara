@@ -16,16 +16,16 @@ class KumaMonitor extends Model
     protected function tags(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? json_decode($value) : null,
-            set: fn($value) => $value ? json_encode($value) : null,
+            get: fn ($value) => $value ? json_decode($value) : null,
+            set: fn ($value) => $value ? json_encode($value) : null,
         );
     }
 
     protected function notificationIdList(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? json_decode($value, true) : null,
-            set: fn($value) => $value ? json_encode($value) : null,
+            get: fn ($value) => $value ? json_decode($value, true) : null,
+            set: fn ($value) => $value ? json_encode($value) : null,
         );
     }
 

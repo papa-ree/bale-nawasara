@@ -15,7 +15,7 @@ class SyncKumaUptimeWithKumaMonitorJob implements ShouldQueue
 
     public function handle(): void
     {
-        $monitor = new KumaProxyService();
+        $monitor = new KumaProxyService;
         $monitor->getIpMonitors();
     }
 }

@@ -14,15 +14,13 @@ class SyncKumaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $monitorId)
-    {
-    }
+    public function __construct(public string $monitorId) {}
 
     public function handle(KumaProxyService $kumaProxy): void
     {
         $monitor = KumaMonitor::find($this->monitorId);
 
-        if (!$monitor) {
+        if (! $monitor) {
             logger()->warning("SyncKumaJob: Monitor {$this->monitorId} not found.");
 
             return;

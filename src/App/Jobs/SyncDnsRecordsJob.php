@@ -9,7 +9,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Models\DnsRecord;
-use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
 use Paparee\BaleNawasara\App\Services\DnsRecordMonitorService;
 use Paparee\BaleNawasara\App\Services\KumaProxyService;
@@ -63,7 +62,7 @@ class SyncDnsRecordsJob implements ShouldQueue
         DnsRecord::whereNotIn('id', $cloudflareIds)->each(function ($record) {
             if ($record->monitor) {
                 // hapus di kuma-proxy
-                $kumaProxy = new KumaProxyService();
+                $kumaProxy = new KumaProxyService;
                 $kumaProxy->deleteMonitor($record->monitor);
 
                 // hapus monitor di DB

@@ -3,7 +3,6 @@
 namespace Paparee\BaleNawasara\App\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Paparee\BaleNawasara\App\Jobs\UpdateKumaMonitorNameJob;
 use Paparee\BaleNawasara\App\Models\KumaMonitor;
 
 class KumaMonitorService
@@ -11,7 +10,7 @@ class KumaMonitorService
     public function updateComment(KumaMonitor $monitor, string $comment, ?int $ipPublicId = null): KumaMonitor
     {
         $data = [
-            'name' => $comment
+            'name' => $comment,
         ];
 
         if ($ipPublicId) {
@@ -31,7 +30,7 @@ class KumaMonitorService
         // Ambil dari cache
         $arpList = Cache::get('mikrotik_arp_list', []);
 
-        if (empty($arpList) || !is_array($arpList)) {
+        if (empty($arpList) || ! is_array($arpList)) {
             logger()->warning('IpAddressMonitorService: mikrotik_arp_list kosong atau invalid.');
 
             return;
@@ -40,7 +39,7 @@ class KumaMonitorService
         foreach ($arpList as $arp) {
             $address = $arp['address'] ?? null;
 
-            if (!$address) {
+            if (! $address) {
                 continue; // skip jika tidak ada IP
             }
 
@@ -60,8 +59,6 @@ class KumaMonitorService
             );
         }
     }
-
-
 
     /**
      * Simpan IP Mikrotik ke table kuma_monitors
