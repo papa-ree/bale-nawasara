@@ -2,6 +2,9 @@
 
 namespace Paparee\BaleNawasara\App\Services;
 
+use Illuminate\Support\Facades\Cache;
+use Paparee\BaleNawasara\App\Jobs\SyncMikrotikBgpJob;
+use Paparee\BaleNawasara\App\Models\IpPublic;
 use RouterOS\Client;
 use RouterOS\Query;
 
@@ -16,6 +19,8 @@ class MikrotikService
             'user' => env('ROUTEROS_USER'),
             'pass' => env('ROUTEROS_PASS'),
             'port' => (int) env('ROUTEROS_PORT', 8728), // default port
+            'timeout' => 30, // default kecil, naikkan ke 30 detik
+            'attempts' => 3, // auto reconnect
             // 'ssl'  => env('MIKROTIK_SSL', false),
             // 'clientOptions' => [
             //     'verify' => false, // karena self-signed
@@ -67,7 +72,7 @@ class MikrotikService
             $ipLong = ip2long($item['address']);
 
             foreach ($addressList as $address) {
-                if (! isset($address['address'])) {
+                if (!isset($address['address'])) {
                     continue;
                 }
 
@@ -92,8 +97,12 @@ class MikrotikService
             return $item;
         }, $arpList);
 
+        // Update cache
+        Cache::put('mikrotik_arp_list', $arpList);
+
         return $arpList;
     }
+
 
     /**
      * Update comment pada ARP entry
@@ -118,11 +127,6 @@ class MikrotikService
         }
     }
 
-    /**
-     * Jadikan IP address static pada ARP entry
-     *
-     * @param  string  $arpId  ID dari ARP
-     */
     public function makeStaticArp(string $arpId, ?string $comment = null): bool
     {
         try {
@@ -141,8 +145,8 @@ class MikrotikService
             $existingComment = $entry['comment'] ?? '';
 
             // 2. Jika sudah static dan comment berbeda → update comment saja
-            if (! $isDynamic) {
-                if (! empty($comment) && $comment !== $existingComment) {
+            if (!$isDynamic) {
+                if (!empty($comment) && $comment !== $existingComment) {
                     $querySet = (new Query('/ip/arp/set'))
                         ->equal('.id', $arpId)
                         ->equal('comment', $comment);
@@ -162,22 +166,25 @@ class MikrotikService
                 ->equal('address', $entry['address'])
                 ->equal('interface', $entry['interface']);
 
-            // Gunakan MAC address palsu jika tidak ada comment
-            $mac = (! empty($comment)) ? $entry['mac-address'] : '00:00:00:00:00:00';
+            // Pakai MAC jika ada, kalau tidak fallback ke 00
+            $mac = !empty($entry['mac-address']) ? $entry['mac-address'] : '00:00:00:00:00:00';
             $queryAdd->equal('mac-address', $mac);
 
             // Tambahkan comment jika ada
-            if (! empty($comment)) {
+            if (!empty($comment)) {
                 $queryAdd->equal('comment', $comment);
             }
 
             $this->client->query($queryAdd)->read();
+
+            SyncMikrotikBgpJob::dispatch();
 
             return true;
         } catch (\Exception $e) {
             return false;
         }
     }
+
 
     public function removeArpEntry(string $arpId): bool
     {
@@ -196,10 +203,12 @@ class MikrotikService
 
             $this->client->query($queryRemove)->read();
 
+            SyncMikrotikBgpJob::dispatch();
+
             return true;
         } catch (\Exception $e) {
             // Log error jika perlu
-            info('Mikrotik ARP error: '.$e->getMessage());
+            info('Mikrotik ARP error: ' . $e->getMessage());
 
             return false;
         }
@@ -325,7 +334,7 @@ class MikrotikService
         $result = [];
 
         foreach ($addressList as $entry) {
-            if (! isset($entry['address'])) {
+            if (!isset($entry['address'])) {
                 continue;
             }
 
@@ -360,7 +369,7 @@ class MikrotikService
                 'address' => $entry['address'],
                 'network' => long2ip($network),
                 'broadcast' => long2ip($broadcast),
-                'range' => long2ip($network + 1).' - '.long2ip($broadcast - 1),
+                'range' => long2ip($network + 1) . ' - ' . long2ip($broadcast - 1),
                 'max_host' => $maxHost,
                 'used_host' => $usedHost,
                 'free_host' => $freeHost,

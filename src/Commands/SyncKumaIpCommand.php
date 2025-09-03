@@ -25,11 +25,13 @@ class SyncKumaIpCommand extends Command
             return;
         }
 
-        $monitors->each(function ($monitor, $index): void {
-            // jeda 5 detik per urutan
-            $delay = now()->addSeconds($index * 5);
+        $monitors->chunk(5)->each(function ($chunk, $batchIndex) {
+            $chunk->each(function ($monitor, $index) use ($batchIndex) {
+                // jeda berdasarkan batch + urutan monitor dalam batch
+                $delay = now()->addSeconds(($batchIndex * 60) + ($index * 3));
 
-            SyncKumaJob::dispatch($monitor->id)->delay($delay);
+                SyncKumaJob::dispatch($monitor->id)->delay($delay);
+            });
         });
 
         $this->info("Dispatched {$monitors->count()} Kuma monitor jobs to queue.");

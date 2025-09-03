@@ -8,11 +8,15 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Paparee\BaleNawasara\App\Models\IpAddress;
 use Paparee\BaleNawasara\App\Models\IpPublic;
+use Paparee\BaleNawasara\App\Models\KumaMonitor;
 use Paparee\BaleNawasara\App\Services\IpAddressMonitorService;
+use Paparee\BaleNawasara\App\Services\KumaMonitorService;
+use Paparee\BaleNawasara\App\Services\KumaProxyService;
 use Paparee\BaleNawasara\App\Services\MikrotikService;
 
 class SyncMikrotikBgpJob implements ShouldQueue
@@ -64,9 +68,12 @@ class SyncMikrotikBgpJob implements ShouldQueue
                 $mikrotikIds[] = $item['.id'];
 
                 IpPublic::updateOrCreate(
-                    ['id' => $item['.id'] ?? uniqid()],
                     [
                         'address' => $item['address'] ?? null,
+                    ],
+                    [
+                        'id' => $item['.id'],
+                        'mikrotik_synced' => true,
                         'interface' => $item['interface'] ?? null,
                         'published' => $item['published'] ?? null,
                         'invalid' => $item['invalid'] ?? null,
@@ -83,13 +90,24 @@ class SyncMikrotikBgpJob implements ShouldQueue
                     ]
                 );
 
-                // send ip arp to table kuma_monitor
-                $kuma_monitor = new IpAddressMonitorService;
-                $kuma_monitor->sendIpToMonitor($item['.id'], $item['address'], $item['comment'] ?? $item['address']);
-
             }
 
+            // send ip arp to table kuma_monitor
+            $kuma_monitor = new KumaMonitorService();
+            $kuma_monitor->syncIpFromCache();
+
+            // // delete record if not in
             IpPublic::whereNotIn('id', $mikrotikIds)->each(function ($record) {
+                if ($record->monitor) {
+                    // hapus di kuma-proxy
+                    $kumaProxy = new KumaProxyService();
+                    $kumaProxy->deleteMonitor($record->monitor);
+
+                    // hapus monitor di DB
+                    $record->monitor->delete();
+                }
+
+                // hapus IpPublic
                 $record->delete();
             });
 

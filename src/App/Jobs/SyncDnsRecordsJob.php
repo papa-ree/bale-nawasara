@@ -12,6 +12,7 @@ use Paparee\BaleNawasara\App\Models\DnsRecord;
 use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
 use Paparee\BaleNawasara\App\Services\CloudflareService;
 use Paparee\BaleNawasara\App\Services\DnsRecordMonitorService;
+use Paparee\BaleNawasara\App\Services\KumaProxyService;
 
 class SyncDnsRecordsJob implements ShouldQueue
 {
@@ -53,16 +54,6 @@ class SyncDnsRecordsJob implements ShouldQueue
             );
 
             if ($record['type'] === 'A') {
-                // NawasaraMonitor::updateOrCreate(
-                //     ['dns_record_id' => $record['id']],
-                //     [
-                //         'url' => 'https://'.$record['name'],
-                //         'look_for_string' => '',
-                //         'uptime_check_method' => 'get',
-                //         'certificate_check_enabled' => true,
-                //         'uptime_check_interval_in_minutes' => config('uptime-monitor.uptime_check.run_interval_in_minutes'),
-                //     ]
-                // );
                 $kuma_monitor = new DnsRecordMonitorService;
                 $kuma_monitor->sendDnsRecordToMonitor($record['id'], $record['name']);
             }
@@ -70,8 +61,14 @@ class SyncDnsRecordsJob implements ShouldQueue
 
         // Hapus DNS record yang tidak ada di Cloudflare
         DnsRecord::whereNotIn('id', $cloudflareIds)->each(function ($record) {
-            // Hapus relasi monitor terlebih dahulu
-            $record->monitor()->delete(); // asumsi relasi: $dnsRecord->monitor()
+            if ($record->monitor) {
+                // hapus di kuma-proxy
+                $kumaProxy = new KumaProxyService();
+                $kumaProxy->deleteMonitor($record->monitor);
+
+                // hapus monitor di DB
+                $record->monitor->delete();
+            }
             $record->delete();
         });
 

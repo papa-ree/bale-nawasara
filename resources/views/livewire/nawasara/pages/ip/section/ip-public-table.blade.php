@@ -1,9 +1,22 @@
 <?php
 
-use function Livewire\Volt\{title, mount};
 use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\WithoutUrlPagination;
-use function Livewire\Volt\{computed, usesPagination, state, uses, updating, hydrate, on};
+use Paparee\BaleNawasara\App\Models\IpPublic;
+use Paparee\BaleNawasara\App\Models\KumaMonitor;
+use Paparee\BaleNawasara\App\Services\MikrotikService;
+
+use function Livewire\Volt\{
+    title,
+    mount,
+    computed,
+    usesPagination,
+    state,
+    uses,
+    updating,
+    hydrate,
+    on
+};
 
 uses([WithoutUrlPagination::class]);
 
@@ -34,12 +47,37 @@ on([
 $availableAddresses = computed(function () {
     $query = strtolower($this->query);
 
-    return collect(cache()->get('mikrotik_arp_list', collect()))
+    //$arp = cache()->get('mikrotik_arp_list', collect());
+    $arpList = collect(cache()->get('mikrotik_arp_list', []));
+    //return collect(cache()->get('mikrotik_arp_list', collect()))
+    return collect($arpList)
         ->filter(function ($item) use ($query) {
             return str_contains(strtolower($item['address'] ?? ''), $query) ||
                 str_contains(strtolower($item['comment'] ?? ''), $query);
         })
-        ->map(fn($item) => (object) $item);
+        ->map(function ($item) {
+            // Cari ip_public berdasarkan address (atau id kalau mappingnya langsung)
+            $ipPublic = IpPublic::where('address', $item['address'] ?? null)->first();
+
+            // Default uptime status null
+            $uptimeStatus = null;
+
+            if ($ipPublic) {
+                $monitor = KumaMonitor::where('hostname', $item['address'])->first();
+                $uptimeStatus = $monitor ? $monitor->uptime_status : 'pending';
+            }
+
+            return (object) [
+                'id' => $item['.id'] ?? null,
+                'address' => $item['address'] ?? null,
+                'comment' => $ipPublic->comment ?? null,
+                'dynamic' => $ipPublic->dynamic ?? null,
+                'interface' => $item['interface'] ?? null,
+                'mac_address' => $item['mac-address'] ?? null,
+                'uptime_status' => $uptimeStatus,
+                'monitor' => $monitor,
+            ];
+        });
 });
 ?>
 
@@ -85,59 +123,45 @@ $availableAddresses = computed(function () {
         <x-slot name="tbody">
             @foreach ($this->availableAddresses as $key => $address)
                 <tr wire:key='address-{{ $key }}' class="hover:bg-gray-50 dark:hover:bg-slate-700/50" x-data="{
-                                                    openIpPublicDetailModal() {
-                                                        $wire.dispatch('openBaleModal', { id: 'ipAddressDetailModal' });
+                        openIpPublicDetailModal() {
+                            $wire.dispatch('openBaleModal', { id: 'ipAddressDetailModal' });
 
-                                                        let originalData = @js($address);
-                                                        let mappedData = {
-                                                            ...originalData,
-                                                            id: originalData['.id'] ?? null,
-                                                            dhcp: originalData['DHCP'] ?? null,
-                                                            mac: originalData['mac-address'] ?? null,
-                                                        };
+                            // ip address data event
+                            $wire.dispatch('setIpData', { data: {id: @js($address->id) ?? '', comment: @js($address->comment) ?? '', dynamic: @js($address->dynamic) ?? '', address: @js($address->address) ?? ''} });
 
-                                                        delete mappedData['.id'];
-                                                        delete mappedData['DHCP'];
-                                                        delete mappedData['mac-address'];
+                            // ip address data for modal
+                            this.$dispatch('ip-address-data', {
+                                modalTitle: 'IP Address Detail',
+                                ipAddressData: @js($address),
+                                monitorData: @js($address->monitor)
+                            });
+                        },
+                        openIpPublicDeleteModal() {
+                            $wire.dispatch('openBaleModal', { id: 'openIpPublicDeleteModal' });
 
-                                                        $wire.dispatch('setIpData', { data: {id: mappedData['id'] ?? '', comment: mappedData['comment'] ?? '', dynamic: mappedData['dynamic'] ?? ''} });
-
-                                                        this.$dispatch('ip-address-data', {
-                                                            modalTitle: 'IP Address Detail',
-                                                            ipAddressData: mappedData
-                                                        });
-                                                    },
-                                                    openIpPublicDeleteModal() {
-                                                        $wire.dispatch('openBaleModal', { id: 'openIpPublicDeleteModal' });
-
-                                                        let originalDataIp = @js($address);
-                                                        let mappedDataIp = {
-                                                            ...originalDataIp,
-                                                            id: originalDataIp['.id'] ?? null,
-                                                        };
-
-                                                        delete mappedDataIp['.id'];
-
-                                                        this.$dispatch('ip-address-data', {
-                                                            modalTitle: 'IP Address Detail',
-                                                            ipAddressData: mappedDataIp
-                                                        });
-                                                    }
-                                                }">
+                            this.$dispatch('ip-address-data', {
+                                ipAddressData: @js($address)
+                            });
+                        }
+                    }">
                     <td class="w-full py-4 pl-4 pr-3 text-sm font-medium text-gray-900 max-w-0 sm:w-auto sm:max-w-none">
                         <div @click="openIpPublicDetailModal"
                             class="flex items-center text-sm text-gray-800 cursor-pointer dark:text-gray-200">
 
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-route-icon lucide-route {{$address->dynamic == 'true' ? 'text-gray-500' : 'text-emerald-400'}}">
-                                <circle cx="6" cy="19" r="3" />
-                                <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
-                                <circle cx="18" cy="5" r="3" />
+                            <span
+                                class="inline-block w-3 h-3 rounded-full {{$address->uptime_status ? 'bg-emerald-500' : 'bg-red-400'}}"></span>
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-shield-check-icon lucide-shield-check mx-2 {{$address->dynamic == 'true' ? 'text-gray-500' : 'text-emerald-400'}}">
+                                <path
+                                    d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+                                <path d="m9 12 2 2 4-4" />
                             </svg>
 
-                            <span class="ml-2">{{ $address->address }}</span>
+                            <span class="">{{ $address->address }}</span>
                         </div>
+
                         <dl class="font-normal lg:hidden">
                             <dt class="sr-only">Interface</dt>
                             <dd class="mt-1 text-gray-700 truncate">

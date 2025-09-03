@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,6 +12,7 @@ return new class extends Migration
     {
         Schema::create('ip_publics', function (Blueprint $table) {
             $table->string('id')->primary()->comment('id by mikrotik, format: .id');
+            $table->boolean('mikrotik_synced')->default(0);
             $table->string('address')->nullable();
             $table->string('interface')->nullable();
             $table->string('published')->nullable();

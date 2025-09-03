@@ -10,24 +10,16 @@ use Illuminate\Queue\SerializesModels;
 use Paparee\BaleNawasara\App\Models\KumaMonitor;
 use Paparee\BaleNawasara\App\Services\KumaProxyService;
 
-class SyncKumaJob implements ShouldQueue
+class DeleteKumaUptimeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $monitorId)
+    public function __construct(public $monitorId)
     {
     }
 
     public function handle(KumaProxyService $kumaProxy): void
     {
-        $monitor = KumaMonitor::find($this->monitorId);
-
-        if (!$monitor) {
-            logger()->warning("SyncKumaJob: Monitor {$this->monitorId} not found.");
-
-            return;
-        }
-
-        $kumaProxy->addMonitor($monitor);
+        $kumaProxy->deleteMonitorById($this->monitorId);
     }
 }

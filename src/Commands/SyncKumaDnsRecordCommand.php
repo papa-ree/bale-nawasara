@@ -25,7 +25,7 @@ class SyncKumaDnsRecordCommand extends Command
             return;
         }
 
-        $monitors->chunk(3)->each(function ($chunk, $batchIndex) {
+        $monitors->chunk(5)->each(function ($chunk, $batchIndex) {
             $chunk->each(function ($monitor, $index) use ($batchIndex) {
                 // jeda berdasarkan batch + urutan monitor dalam batch
                 $delay = now()->addSeconds(($batchIndex * 60) + ($index * 3));

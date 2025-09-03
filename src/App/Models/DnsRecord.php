@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class DnsRecord extends Model
@@ -46,32 +47,26 @@ class DnsRecord extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Str::remove('.ponorogo.go.id', $value),
+            get: fn(string $value) => Str::remove('.ponorogo.go.id', $value),
         );
     }
 
     protected function content(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Str::remove('"', Str::limit($value, 20, '')),
+            get: fn(string $value) => Str::remove('"', Str::limit($value, 20, '')),
         );
     }
 
     protected function createdOn(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => Carbon::parse($value)->diffForHumans(),
+            get: fn(string $value) => Carbon::parse($value)->diffForHumans(),
         );
     }
 
-    // public function monitor()
-    // {
-    //     return $this->hasOne(NawasaraMonitor::class);
-    // }
-
-    public function monitor()
+    public function monitor(): HasOne
     {
-        // ip_addresses.address → kuma_monitors.hostname
         return $this->hasOne(KumaMonitor::class);
     }
 

@@ -18,7 +18,7 @@ mount(function () {
         <livewire:nawasara.pages.ip.modal.ip-detail-modal />
     </x-bale.modal>
 
-    <x-bale.modal modalId="openIpPublicDeleteModal" size="2xl" staticBackdrop>
+    <x-bale.modal modalId="openIpPublicDeleteModal" size="4xl" staticBackdrop>
         <livewire:nawasara.pages.ip.modal.ip-delete-confirmation-modal />
     </x-bale.modal>
 </div>

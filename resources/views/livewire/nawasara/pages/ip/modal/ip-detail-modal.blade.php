@@ -1,10 +1,16 @@
 <?php
 
 use Livewire\Volt\Component;
-use Paparee\BaleNawasara\App\Services\MikrotikService;
 use Livewire\Attributes\{Locked, On};
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Paparee\BaleNawasara\App\Jobs\SyncMikrotikBgpJob;
+use Illuminate\Support\Facades\DB;
+use Paparee\BaleNawasara\App\Jobs\UpdateArpMikrotikBgpJob;
+use Paparee\BaleNawasara\App\Models\KumaMonitor;
+use Paparee\BaleNawasara\App\Models\IpPublic;
+use Paparee\BaleNawasara\App\Services\MikrotikService;
+use Paparee\BaleNawasara\App\Services\IpPublicService;
+use Paparee\BaleNawasara\App\Services\KumaMonitorService;
+use Paparee\BaleNawasara\App\Services\UptimeKumaService;
 
 new class extends Component {
 
@@ -12,30 +18,78 @@ new class extends Component {
     public $id;
 
     public $comment;
+    public $address;
     public $make_static;
+    public $monitor;
+    //public $uptime_status;
 
     #[On('setIpData')]
     public function setIpData($data)
     {
+        // mikrotik id
         $this->id = $data['id'];
         $this->comment = $data['comment'];
+        $this->address = $data['address'];
         $this->make_static = $data['dynamic'] == 'true' ? false : true;
+
+        // monitor data
+        $this->monitor = KumaMonitor::whereIpPublicId($this->id)->first();
     }
 
     public function update(LivewireAlert $alert)
     {
-        $mikrotik = new MikrotikService();
-        $mikrotik->makeStaticArp($this->id, $this->comment);
+        DB::beginTransaction();
 
-        $arpList = $mikrotik->getArpLists();
+        try {
+            $mikrotik = new MikrotikService();
+            $mikrotik->makeStaticArp($this->id, $this->comment);
 
-        Cache::put('mikrotik_arp_list', $arpList);
+            // get data
+            $ip_public = IpPublic::find($this->id);
 
-        session()->flash('saved', [
-            'title' => 'Update Success!',
-        ]);
+            // update comment in ip_publics table
+            $ip_public_service = new IpPublicService();
+            $ip_public_service->updateComment($ip_public, $this->comment);
 
-        $this->redirect('/network/ip-publics', navigate: true);
+            if ($this->monitor) {
+                $monitorService = new KumaMonitorService();
+                $monitorService->updateComment($this->monitor, $this->comment);
+
+                $uptimeKumaService = new UptimeKumaService();
+                $uptimeKumaService->updateComment($this->monitor->kuma_id, $this->comment);
+            }
+
+            DB::commit();
+
+            session()->flash('saved', [
+                'title' => 'Update Success!',
+            ]);
+
+            $this->redirect('/network/ip-publics', navigate: true);
+        } catch (\Throwable $th) {
+            $this->dispatch('disabling-button', params: false);
+
+            DB::rollBack();
+            info($th->getMessage());
+            $alert->title('Something wrong!')->position('top-end')->error()->toast()->show();
+        }
+    }
+
+    public function updateIpPublicByAddress()
+    {
+        //dd($comment);
+        try {
+            $ip = IpPublic::where('address', $this->address)->firstOrFail();
+            $ip->mikrotik_synced = false;
+            $ip->comment = $this->comment;
+            $ip->dynamic = $this->make_static ? 'false' : 'true';
+            $ip->save();
+            //dd($ip);
+
+            return true;
+        } catch (\Throwable $th) {
+            return false;
+        }
     }
 
     public function resetVal()
@@ -54,6 +108,15 @@ new class extends Component {
     ipIsDynamic: '',
     ipInterface: '',
     ipMac: '-',
+    uptimeTimeout: '',
+    uptimeInterval: '',
+    uptimeRetryInterval: '',
+    uptimeResendInterval: '',
+    uptimeMaxRetry: '',
+    uptimeStatus: '',
+    uptimeCheckFailureReason: '',
+    uptimeLastUpdate: '',
+    uptimeKumaSynced: '',
     init() {
         this.resetState();
     },
@@ -65,6 +128,15 @@ new class extends Component {
         this.ipIsDynamic = '';
         this.ipInterface = '';
         this.ipMac = '-';
+        this.uptimeTimeout = '';
+        this.uptimeInterval = '';
+        this.uptimeRetryInterval = '';
+        this.uptimeResendInterval = '';
+        this.uptimeMaxRetry = '';
+        this.uptimeStatus = '';
+        this.uptimeCheckFailureReason = '';
+        this.uptimeLastUpdate = '';
+        this.uptimeKumaSynced = '';
     },
     handleIpAddressData(detail) {
         this.ipId = detail.ipAddressData.id;
@@ -73,11 +145,21 @@ new class extends Component {
         this.ipComment = detail.ipAddressData.comment;
         this.ipIsDynamic = detail.ipAddressData.dynamic;
         this.ipInterface = detail.ipAddressData.interface;
-        this.ipMac = detail.ipAddressData.mac;
+        this.ipMac = detail.ipAddressData.mac_addpress;
+        this.uptimeTimeout = detail.monitorData.timeout;
+        this.uptimeInterval = detail.monitorData.interval;
+        this.uptimeRetryInterval = detail.monitorData.retry_interval;
+        this.uptimeResendInterval = detail.monitorData.resend_interval;
+        this.uptimeMaxRetry = detail.monitorData.max_retries;
+        this.uptimeStatus = detail.monitorData.uptime_status;
+        this.uptimeCheckFailureReason = detail.monitorData.uptime_check_failure_reason;
+        this.uptimeLastUpdate = detail.monitorData.updated_at;
+        this.uptimeKumaSynced = detail.monitorData.kuma_synced;
     },
 }" x-init="init()" @ip-address-data.window="handleIpAddressData($event.detail)">
 
-    <form wire:submit='update' class="">
+    <form wire:submit='update' class="mb-6">
+
         <h3 class="mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">
             IP Address Information
         </h3>
@@ -89,7 +171,7 @@ new class extends Component {
                 <p class="font-semibold text-gray-800 dark:text-white" x-text="ipAddress"></p>
             </div>
 
-            <div>
+            <div x-show="ipDhcp">
                 <p class="text-sm text-gray-500 dark:text-gray-400">DHCP</p>
                 <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="ipDhcp"></p>
             </div>
@@ -104,6 +186,7 @@ new class extends Component {
                 <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="ipMac"></p>
             </div>
 
+            {{-- skeleton --}}
             <div class="space-y-4 animate-pulse" wire:loading>
                 {{-- Make Static skeleteon --}}
                 <div class="flex items-center justify-between">
@@ -146,12 +229,77 @@ new class extends Component {
             </div>
         </div>
 
+        <h3 class="mt-10 mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">
+            Monitoring Status
+        </h3>
+
+        <div class="space-y-4">
+            <template x-if="uptimeKumaSynced">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Uptime</p>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full"
+                            :class="uptimeStatus ? 'bg-emerald-500' : 'bg-red-400'"></span>
+                        <p class="font-semibold" x-text="uptimeStatus ? 'Up' : 'Down'"
+                            :class="uptimeStatus ? 'text-emerald-500' : 'text-red-400'">
+                        </p>
+                    </div>
+
+                    <p class="text-xs">
+                        {{ __('Last Updated At ') }} <span x-text="uptimeLastUpdate"></span>
+                    </p>
+
+                    <div class="p-3 text-sm border-l-4 border-red-300 rounded-tr-xl rounded-br-xl bg-red-50"
+                        x-show="!uptimeStatus">
+                        <p class="text-red-500 dark:text-red-400" x-text="uptimeCheckFailureReason"></p>
+                    </div>
+                </div>
+            </template>
+            <template x-if="!uptimeKumaSynced">
+                Not Sync Kuma
+            </template>
+        </div>
+
+        <h3 class="mt-10 mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">
+            Monitoring Detail
+        </h3>
+
+        <div class="grid grid-cols-1 space-y-4 sm:grid-cols-3 gap-x-4">
+
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Timeout</p>
+                <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="uptimeTimeout"></p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Interval</p>
+                <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="uptimeInterval"></p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Retry Interval</p>
+                <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="uptimeRetryInterval">
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Resend Interval</p>
+                <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="uptimeResendInterval">
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Max Retries</p>
+                <p class="mt-1 font-semibold text-gray-800 dark:text-white" x-text="uptimeMaxRetry"></p>
+            </div>
+        </div>
+
         <x-bale.modal-action>
             <x-bale.button label="Save Change" type="submit" @click="useSpinner()" class="ml-3" />
             <x-bale.secondary-button label="Cancel" type="button"
                 wire:click="$dispatch('closeBaleModal', { id: 'ipAddressDetailModal' }); $wire.resetVal()" />
         </x-bale.modal-action>
-    </form>
 
+    </form>
 
 </div>

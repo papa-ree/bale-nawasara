@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -20,9 +19,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('pathName')->nullable();
-            $table->string('url')->unique()->nullable();
+            $table->string('url')->nullable();
             $table->string('method')->nullable();
-            $table->string('hostname')->unique()->nullable();
+            $table->string('hostname')->nullable();
             $table->string('port')->nullable();
             $table->boolean('active')->default(1)->nullable();
             $table->string('type');
@@ -30,6 +29,7 @@ return new class extends Migration
             $table->integer('interval')->default(60);
             $table->integer('retry_interval')->default(60);
             $table->integer('resend_interval')->default(0);
+            $table->integer('max_retries')->default(0);
             $table->boolean('expiry_notification')->default(0);
             $table->json('tags')->nullable();
             $table->json('notification_id_list')->nullable();

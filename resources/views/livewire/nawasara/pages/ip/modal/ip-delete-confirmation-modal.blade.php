@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Locked;
 use Paparee\BaleNawasara\App\Services\MikrotikService;
+use Paparee\BaleNawasara\App\Models\IpPublic;
 
 new class extends Component {
     #[Locked]
@@ -36,12 +37,12 @@ new class extends Component {
 
     private function delete()
     {
+        IpPublic::find($this->id)->update([
+            'dynamic' => true,
+        ]);
+
         $m = new MikrotikService();
         $m->removeArpEntry($this->ip_id);
-
-        $arpList = $m->getArpLists();
-
-        Cache::put('mikrotik_arp_list', $arpList);
 
         return true;
     }
