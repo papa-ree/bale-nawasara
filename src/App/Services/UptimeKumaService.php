@@ -2,7 +2,6 @@
 
 namespace Paparee\BaleNawasara\App\Services;
 
-use Paparee\BaleNawasara\App\Models\KumaMonitor;
 use Paparee\BaleNawasara\App\Models\UptimeKumaMonitor;
 
 class UptimeKumaService

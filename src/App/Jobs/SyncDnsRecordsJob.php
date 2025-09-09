@@ -62,7 +62,7 @@ class SyncDnsRecordsJob implements ShouldQueue
         DnsRecord::whereNotIn('id', $cloudflareIds)->each(function ($record) {
             if ($record->monitor) {
                 // hapus di kuma-proxy
-                $kumaProxy = new KumaProxyService();
+                $kumaProxy = new KumaProxyService;
                 $kumaProxy->deleteMonitor($record->monitor);
 
                 // hapus monitor di DB
