@@ -255,9 +255,6 @@ new class extends Component {
                     </div>
                 </div>
             </template>
-            <template x-if="!uptimeKumaSynced">
-                Not Sync Kuma
-            </template>
         </div>
 
         <h3 class="mt-10 mb-4 text-lg font-semibold text-gray-700 border-b-2 border-gray-300 dark:text-gray-300">

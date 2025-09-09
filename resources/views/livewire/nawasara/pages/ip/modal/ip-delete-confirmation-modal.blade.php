@@ -37,9 +37,7 @@ new class extends Component {
 
     private function delete()
     {
-        IpPublic::find($this->id)->update([
-            'dynamic' => true,
-        ]);
+        IpPublic::find($this->ip_id)->delete();
 
         $m = new MikrotikService();
         $m->removeArpEntry($this->ip_id);
