@@ -51,16 +51,14 @@ on([
                         </span>
                     </div>
                 </th>
-                <th scope="col"
-                    class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell">
+                <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 md:table-cell">
                     <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
                             {{ __('Proxied Status') }}
                         </span>
                     </div>
                 </th>
-                <th scope="col"
-                    class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">
+                <th scope="col" class="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">
                     <div class="flex items-center gap-x-2">
                         <span class="text-xs font-semibold tracking-wide text-gray-800 uppercase dark:text-gray-200">
                             {{ __('Monitor status') }}
@@ -75,24 +73,23 @@ on([
 
         <x-slot name="tbody">
             @foreach ($this->availableRecords as $record)
-                <tr wire:key='record-{{ $record->id }}' class="hover:bg-gray-50 dark:hover:bg-slate-700/50"
-                    x-data="{
-                        openDnsRecordModal() {
-                            $wire.dispatch('openBaleModal', { id: 'dnsRecordModal' });
-                            $wire.dispatch('getMonitorSslStatus', { monitorId: @js($record->monitor ? $record->monitor->id : '') ?? '' });
-                            this.$dispatch('record-data', {
-                                modalTitle: 'Record Detail',
-                                recordData: @js($record),
-                                recordStatus: @js($record->monitor ? $record->monitor : ''),
-                                recordContact: @js($record->contact ?? ''),
-                            });
-                        },
-                    }">
+                <tr wire:key='record-{{ $record->id }}' class="hover:bg-gray-50 dark:hover:bg-slate-700/50" x-data="{
+                                                openDnsRecordModal() {
+                                                    $wire.dispatch('openBaleModal', { id: 'dnsRecordModal' });
+                                                    $wire.dispatch('getMonitorStatus', { monitorId: @js($record->monitor ? $record->monitor->id : '') ?? '' });
+                                                    this.$dispatch('record-data', {
+                                                        modalTitle: 'Record Detail',
+                                                        recordData: @js($record),
+                                                        recordStatus: @js($record->monitor ? $record->monitor : ''),
+                                                        recordContact: @js($record->contact ?? ''),
+                                                    });
+                                                },
+                                            }">
                     <td class="w-full py-4 pl-4 pr-3 text-sm font-medium text-gray-900 max-w-0 sm:w-auto sm:max-w-none">
                         <div class="flex items-center text-sm text-gray-800 dark:text-gray-200 ">
                             <div class="inline-block hs-tooltip [--placement:right]">
                                 @if ($record->monitor)
-                                    @if ($record->monitor->uptime_status === 'up')
+                                    @if ($record->monitor->uptime_status)
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"
                                             class="size-4 hs-tooltip-toggle text-emerald-400">
                                             <path fill-rule="evenodd"
@@ -136,9 +133,9 @@ on([
                                 <div @click="openDnsRecordModal">{{ $record->name }}</div>
                                 <a href="{{ $record->type === 'A' ? 'https://' . $record->name . '.ponorogo.go.id' : '#' }}"
                                     target="blank_" class="" x-show="showExternalLink">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round"
                                         class="lucide lucide-external-link-icon lucide-external-link">
                                         <path d="M15 3h6v6" />
                                         <path d="M10 14 21 3" />
@@ -153,13 +150,6 @@ on([
                             <dd class="mt-1 text-gray-700 truncate">
                                 <span class="block text-xs text-gray-500 dark:text-gray-200">
                                     {{ $record->content }}
-
-                                    {{-- @foreach ($record->roles as $role)
-                                        <div @click="openDnsRecordModal"
-                                            class="inline-block px-2 py-1 truncate cursor-pointer text-xs rounded-full {{ $this->getRoleColor($loop->index) }}">
-                                            {{ $role->name }}
-                                        </div>
-                                    @endforeach --}}
                                 </span>
                             </dd>
                             <dt class="sr-only md:hidden">Proxied Status</dt>
@@ -167,18 +157,18 @@ on([
                                 <span class="block text-xs text-gray-500">Proxied Status
                                     <div class="flex items-center gap-x-2">
                                         @if ($record->proxied)
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round"
                                                 class="text-orange-400 lucide lucide-cloud-check-icon lucide-cloud-check">
                                                 <path d="m17 15-5.5 5.5L9 18" />
                                                 <path d="M5 17.743A7 7 0 1 1 15.71 10h1.79a4.5 4.5 0 0 1 1.5 8.742" />
                                             </svg>
                                             Proxied
                                         @else
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round"
                                                 class="lucide lucide-cloud-alert-icon lucide-cloud-alert">
                                                 <path d="M12 12v4" />
                                                 <path d="M12 20h.01" />
@@ -199,7 +189,7 @@ on([
                                                 Uptime
                                             </div>
                                             <div
-                                                class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->certificate_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                                class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->expiry_notification ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
                                                 SSL
                                             </div>
                                         @else
@@ -216,27 +206,25 @@ on([
 
                     <td class="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
                         {{-- @foreach ($record->ip as $tag)
-                            <span class="inline-block px-2 py-1 text-xs truncate rounded-full">
-                            </span>
-                            @endforeach --}}
+                        <span class="inline-block px-2 py-1 text-xs truncate rounded-full">
+                        </span>
+                        @endforeach --}}
                         {{ Illuminate\Support\Str::limit($record->content, 15) }}
                     </td>
 
                     <td class="hidden px-3 py-4 text-sm text-gray-500 md:table-cell">
                         <div class="flex items-center gap-x-2">
                             @if ($record->proxied)
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                     class="text-orange-400 lucide lucide-cloud-check-icon lucide-cloud-check">
                                     <path d="m17 15-5.5 5.5L9 18" />
                                     <path d="M5 17.743A7 7 0 1 1 15.71 10h1.79a4.5 4.5 0 0 1 1.5 8.742" />
                                 </svg>
                                 Proxied
                             @else
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                     class="lucide lucide-cloud-alert-icon lucide-cloud-alert">
                                     <path d="M12 12v4" />
                                     <path d="M12 20h.01" />
@@ -255,7 +243,7 @@ on([
                                     Uptime
                                 </div>
                                 <div
-                                    class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->certificate_check_enabled ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
+                                    class="inline-flex items-center gap-x-1.5 py-1 px-2 rounded-full text-xs font-medium {{ $record->monitor->expiry_notification ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-500' : 'bg-gray-100 text-gray-800 dark:bg-white/30 dark:text-white' }}">
                                     SSL
                                 </div>
                             @else
@@ -271,9 +259,9 @@ on([
                         <div class="hs-dropdown relative inline-block [--placement:bottom|left]">
                             <button id="hs-table-dropdown-{{ $record->id }}" type="button"
                                 class="hs-dropdown-toggle py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg text-gray-700 align-middle disabled:opacity-50 disabled:pointer-events-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-emerald-300 transition-all text-sm dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800">
-                                <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24"
-                                    height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <svg class="flex-shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="1" />
                                     <circle cx="19" cy="12" r="1" />
                                     <circle cx="5" cy="12" r="1" />

@@ -2,14 +2,14 @@
 
 use Livewire\Volt\Component;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Paparee\BaleNawasara\App\Models\NawasaraMonitor;
+use Paparee\BaleNawasara\App\Models\KumaMonitor;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Locked;
 
 new class extends Component {
-    public $uptime_check_enabled;
-    public $certificate_check_enabled;
+    public bool $uptime_check_enabled;
+    public bool $expiry_notification;
 
     #[Locked]
     public $monitorId;
@@ -17,15 +17,15 @@ new class extends Component {
     public $monitor;
     public $subdomains = 'new';
 
-    #[On('getMonitorSslStatus')]
-    public function getMonitorSslStatus($monitorId)
+    #[On('getMonitorStatus')]
+    public function getMonitorStatus($monitorId)
     {
         // dump($id);
-        $this->monitor = NawasaraMonitor::find($monitorId);
+        $this->monitor = KumaMonitor::find($monitorId);
 
         if ($this->monitor) {
             $this->uptime_check_enabled = $this->monitor->uptime_check_enabled;
-            $this->certificate_check_enabled = $this->monitor->certificate_check_enabled;
+            $this->expiry_notification = $this->monitor->expiry_notification;
         }
     }
 
@@ -37,17 +37,15 @@ new class extends Component {
         try {
             $this->dispatch('disabling-button', params: true);
 
-            $nawasara = NawasaraMonitor::whereDnsRecordId($record_id)->first();
-
             if (isset($this->uptime_check_enabled)) {
-                $nawasara->update([
+                $this->monitor->update([
                     'uptime_check_enabled' => $this->uptime_check_enabled,
                 ]);
             }
 
-            if (isset($this->certificate_check_enabled)) {
-                $nawasara->update([
-                    'certificate_check_enabled' => $this->certificate_check_enabled,
+            if (isset($this->expiry_notification)) {
+                $this->monitor->update([
+                    'expiry_notification' => $this->expiry_notification,
                 ]);
             }
 
@@ -55,15 +53,12 @@ new class extends Component {
 
             $this->dispatch('closeBaleModal', id: 'dnsRecordModal');
 
+            $this->dispatch('refresh-dns-record-list');
+
             $alert->title('Update Success!')->position('top-end')->success()->toast()->show();
 
             $this->dispatch('disabling-button', params: false);
 
-            // session()->flash('saved', [
-            //     'title' => 'Update Success!',
-            // ]);
-
-            // $this->redirect('dns', navigate: true);
         } catch (\Throwable $th) {
             $this->dispatch('disabling-button', params: false);
 
@@ -90,12 +85,8 @@ new class extends Component {
             this.monitorUptimeStatus = '';
             this.monitorUptimeFailedReason = '';
             this.monitorUptimeCheckEnabled = null;
-            this.monitorUptimeLastCheck = null;
-            this.monitorSslStatus = '';
-            this.monitorSslFailedReason = '';
-            this.monitorSslCheckEnabled = null;
+            this.monitorExpiryNotification = null;
             this.monitorSslExpirationDate = null;
-            this.monitorSslCheckFailureReason = null;
             this.contactId = null;
             this.contactName = null;
             this.contactPhone = null;
@@ -103,7 +94,6 @@ new class extends Component {
         },
         handlePermissionData(detail) {
             $wire.$set('subdomains', detail.recordData.name);
-            console.log(detail.recordData.name);
             this.modalTitle = detail.modalTitle;
             this.recordId = detail.recordData.id;
             this.recordName = detail.recordData.name;
@@ -114,19 +104,14 @@ new class extends Component {
             this.monitorUptimeStatus = detail.recordStatus.uptime_status;
             this.monitorUptimeFailedReason = detail.recordStatus.uptime_check_failure_reason;
             this.monitorUptimeCheckEnabled = detail.recordStatus.uptime_check_enabled;
-            this.monitorUptimeLastCheck = detail.recordStatus.uptime_last_check_date;
-            this.monitorSslStatus = detail.recordStatus.certificate_status;
-            this.monitorSslFailedReason = detail.recordStatus.certificate_check_failure_reason;
-            this.monitorSslCheckEnabled = detail.recordStatus.certificate_check_enabled;
+            this.monitorExpiryNotification = detail.recordStatus.expiry_notification;
             this.monitorSslExpirationDate = detail.recordStatus.certificate_expiration_date;
-            this.monitorSslCheckFailureReason = detail.recordStatus.certificate_check_failure_reason;
             this.contactId = detail.recordContact.pic_contact_id;
             this.contactName = detail.recordContact.contact_name;
             this.contactPhone = detail.recordContact.contact_phone;
             this.contactRecoveryEmail = detail.recordContact.recovery_email_address;
         },
-}" x-init="init()" @record-data.window="handlePermissionData($event.detail)"
-    @modal-reset.window="init()">
+}" x-init="init()" @record-data.window="handlePermissionData($event.detail)" @modal-reset.window="init()">
 
     <form>
 
@@ -175,16 +160,16 @@ new class extends Component {
                             <p class="text-sm text-gray-500 dark:text-gray-400">Uptime</p>
                             <div class="flex items-center gap-2">
                                 <span class="inline-block w-3 h-3 rounded-full"
-                                    :class="monitorUptimeStatus == 'down' ? 'bg-red-400' : 'bg-emerald-500'"></span>
-                                <p class="font-semibold" x-text="monitorUptimeStatus"
-                                    :class="monitorUptimeStatus == 'down' ? 'text-red-400' : 'text-emerald-500'">
+                                    :class="monitorUptimeStatus ? 'bg-emerald-500' : 'bg-red-400'"></span>
+                                <p class="font-semibold" x-text="monitorUptimeStatus ? 'Up' : 'Down'"
+                                    :class="monitorUptimeStatus ? 'text-emerald-500' : 'text-red-400'">
                                 </p>
                             </div>
-                            <p class="text-xs" x-show="monitorUptimeStatus == 'up'">
+                            {{-- <p class="text-xs" x-show="monitorUptimeStatus == 'up'">
                                 {{ __('Last Check At ') }} <span x-text="monitorUptimeLastCheck"></span>
-                            </p>
+                            </p> --}}
                             <div class="p-3 text-sm border-l-4 border-red-300 rounded-tr-xl rounded-br-xl bg-red-50"
-                                x-show="monitorUptimeStatus == 'down'">
+                                x-show="!monitorUptimeStatus">
                                 <p class="text-red-500 dark:text-red-400" x-text="monitorUptimeFailedReason"></p>
                             </div>
                         </div>
@@ -193,20 +178,19 @@ new class extends Component {
                             <p class="text-sm text-gray-500 dark:text-gray-400">SSL</p>
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="inline-block w-3 h-3 rounded-full"
-                                    :class="monitorSslStatus == 'invalid' ?
-                                        'bg-red-400' : 'bg-emerald-500'"></span>
-                                <p class="font-semibold" x-text="monitorSslStatus"
-                                    :class="monitorSslStatus == 'invalid' ?
-                                        'text-red-400' : 'text-emerald-500'">
+                                    :class="monitorUptimeStatus ? 'bg-emerald-500' : 'bg-red-400'"></span>
+                                <p class="font-semibold" x-text="monitorUptimeStatus ? 'Valid' : 'Error'"
+                                    :class="monitorUptimeStatus ? 'text-emerald-500' : 'text-red-400'">
                                 </p>
                             </div>
-                            <p class="text-xs" x-show="monitorSslStatus == 'valid'">
+                            <p class="text-xs" x-show="monitorSslExpirationDate">
                                 {{ __('Valid until ') }} <span x-text="monitorSslExpirationDate"></span>
                             </p>
-                            <div class="p-3 text-sm border-l-4 border-red-300 rounded-tr-xl rounded-br-xl bg-red-50"
-                                x-show="monitorSslStatus == 'invalid'">
-                                <p class="text-red-500 dark:text-red-400" x-text="monitorSslCheckFailureReason"></p>
-                            </div>
+                            {{-- <div
+                                class="p-3 text-sm border-l-4 border-red-300 rounded-tr-xl rounded-br-xl bg-red-50"
+                                x-show="!monitorUptimeStatus">
+                                <p class="text-red-500 dark:text-red-400" x-text="monitorUptimeFailedReason"></p>
+                            </div> --}}
                         </div>
 
                     </div>
@@ -284,7 +268,6 @@ new class extends Component {
                                     class="block text-sm text-gray-600 dark:text-neutral-500">
                                     Enable uptime monitoring
                                 </span>
-                                {{-- {{ $uptime_check_enabled }} --}}
                             </label>
                             <div class="flex items-center h-5 mt-1">
                                 <input id="uptime-monitor" name="uptime-monitor" type="checkbox"
@@ -304,11 +287,9 @@ new class extends Component {
                                     class="block text-sm text-gray-600 dark:text-neutral-500">
                                     Enable SSL certificate validation
                                 </span>
-                                {{-- {{ $certificate_check_enabled }} --}}
                             </label>
                             <div class="flex items-center h-5 mt-1">
-                                <input id="ssl-check" name="ssl-check" type="checkbox"
-                                    wire:model='certificate_check_enabled'
+                                <input id="ssl-check" name="ssl-check" type="checkbox" wire:model='expiry_notification'
                                     class="w-5 h-5 transition duration-200 border-gray-400 rounded-full text-emerald-400 focus:ring-emerald-500 checked:border-emerald-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-emerald-500 dark:checked:border-emerald-500 dark:focus:ring-offset-gray-800"
                                     aria-describedby="ssl-check-description">
                             </div>

@@ -34,6 +34,11 @@ class KumaMonitor extends Model
         return $this->belongsTo(IpPublic::class);
     }
 
+    public function dnsRecord(): BelongsTo
+    {
+        return $this->belongsTo(DnsRecord::class);
+    }
+
     public function uptime(): BelongsTo
     {
         return $this->belongsTo(UptimeKumaMonitor::class, 'kuma_id');
