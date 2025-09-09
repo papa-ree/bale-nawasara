@@ -2,7 +2,6 @@
 
 namespace Paparee\BaleNawasara\App\Services;
 
-use Illuminate\Support\Facades\Cache;
 use Paparee\BaleNawasara\App\Models\KumaMonitor;
 
 class DnsRecordMonitorService
