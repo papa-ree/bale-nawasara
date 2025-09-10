@@ -5,6 +5,7 @@ namespace Paparee\BaleNawasara\App\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Paparee\BaleNawasara\App\Models\KumaMonitor;
+use Paparee\BaleNawasara\App\Services\WagoService;
 
 class KumaWebhookController extends Controller
 {
@@ -37,6 +38,15 @@ class KumaWebhookController extends Controller
                         'certificate_expiration_date' => now()->addDays((int) $days),
                     ]);
                 }
+
+                // Kirim notifikasi via WhatsApp
+                (new WagoService())->sendMessageGroup("120363402020043689", message:
+                    "🔒 *SSL WARNING*  
+                        *Monitor:* {$kuma->name}  
+                        *Domain:* {$kuma->url}
+                        _Status:_ ⚠️ SSL akan kedaluwarsa  
+                        _Sisa:_ {$kuma->certificate_expiration_date} hari
+                    ");
             }
 
             // info("Certificate expiry handled", $data);
@@ -63,9 +73,35 @@ class KumaWebhookController extends Controller
                 'uptime_check_failure_reason' => $uptime_check_failure_reason,
                 'uptime_check_failure_duration' => $uptime_check_failure_duration,
             ]);
-        }
 
-        // info("Heartbeat handled", $data);
+            if ($uptime_status === 1) {
+                // UP
+                $msg = "✅ *UPTIME ALERT*  
+*Monitor:* {$kuma->name}  
+*Jenis:* {$kuma->type}  
+*Target:* {$kuma->url}  "
+                ;
+            } elseif ($uptime_status === 0) {
+                // DOWN
+                $msg = "❌ *DOWNTIME ALERT*  
+*Monitor:* {$kuma->name}  
+*Jenis:* {$kuma->type}  
+*Target:* {$kuma->url}  
+_Error:_ {$uptime_check_failure_reason}"
+                ;
+            } else {
+                $msg = "✅ *UPTIME ALERT*  
+*Monitor:* Trial Monitor  
+*Jenis:* HTTP/PING  
+*Target:* url/hostname  
+_Status:_ ✅ *UP*"
+                ;
+            }
+
+            if (isset($msg)) {
+                (new WagoService())->sendMessageGroup("120363402020043689", $msg);
+            }
+        }
 
         return response()->json(['status' => 'ok']);
     }
