@@ -40,8 +40,7 @@ class KumaWebhookController extends Controller
                 }
 
                 // Kirim notifikasi via WhatsApp
-                (new WagoService())->sendMessageGroup("120363402020043689", message:
-                    "🔒 *SSL WARNING*  
+                (new WagoService)->sendMessageGroup('120363402020043689', message: "🔒 *SSL WARNING*  
                         *Monitor:* {$kuma->name}  
                         *Domain:* {$kuma->url}
                         _Status:_ ⚠️ SSL akan kedaluwarsa  
@@ -79,27 +78,24 @@ class KumaWebhookController extends Controller
                 $msg = "✅ *UPTIME ALERT*  
 *Monitor:* {$kuma->name}  
 *Jenis:* {$kuma->type}  
-*Target:* {$kuma->url}  "
-                ;
+*Target:* {$kuma->url}  ";
             } elseif ($uptime_status === 0) {
                 // DOWN
                 $msg = "❌ *DOWNTIME ALERT*  
 *Monitor:* {$kuma->name}  
 *Jenis:* {$kuma->type}  
 *Target:* {$kuma->url}  
-_Error:_ {$uptime_check_failure_reason}"
-                ;
+_Error:_ {$uptime_check_failure_reason}";
             } else {
-                $msg = "✅ *UPTIME ALERT*  
+                $msg = '✅ *UPTIME ALERT*  
 *Monitor:* Trial Monitor  
 *Jenis:* HTTP/PING  
 *Target:* url/hostname  
-_Status:_ ✅ *UP*"
-                ;
+_Status:_ ✅ *UP*';
             }
 
             if (isset($msg)) {
-                (new WagoService())->sendMessageGroup("120363402020043689", $msg);
+                (new WagoService)->sendMessageGroup('120363402020043689', $msg);
             }
 
             // if (!$this->isQuietHours()) {

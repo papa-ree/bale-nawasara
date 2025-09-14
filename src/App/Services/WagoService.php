@@ -3,7 +3,6 @@
 namespace Paparee\BaleNawasara\App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Paparee\BaleNawasara\App\Models\UptimeKumaMonitor;
 
 class WagoService
 {
@@ -29,7 +28,7 @@ class WagoService
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ])
-            ->post(env('WHATSAPP_GO_URL') . '/send/message', [
+            ->post(env('WHATSAPP_GO_URL').'/send/message', [
                 'phone' => "{$groupId}@g.us",
                 'message' => $message,
             ]);
