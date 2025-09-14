@@ -28,7 +28,7 @@ class WagoController extends Controller
         }
 
         try {
-            $key = 'wago-send-message:' . $request->ip();
+            $key = 'wago-send-message:'.$request->ip();
             $limit = 10;
 
             // cek rate limiter
@@ -50,7 +50,7 @@ class WagoController extends Controller
             RateLimiter::hit($key, 60); // reset setiap 60 detik
 
             // langsung kirim
-            $response = (new WagoService())->sendMessage($request->phone, $request->message, $request->reply_message_id);
+            $response = (new WagoService)->sendMessage($request->phone, $request->message, $request->reply_message_id);
 
             if ($response->successful()) {
                 return response()->json([
@@ -70,7 +70,7 @@ class WagoController extends Controller
             ], $response->status());
 
         } catch (\Exception $e) {
-            info('Wago Error message: ' . $e->getMessage());
+            info('Wago Error message: '.$e->getMessage());
 
             return response()->json([
                 'code' => 500,
@@ -79,5 +79,4 @@ class WagoController extends Controller
             ], 500);
         }
     }
-
 }

@@ -43,7 +43,7 @@ class CloudflareWebhookController extends Controller
             return $auth; // balikan response unauthorized
         }
 
-        // Kalau lolos verifikasi → proses payload        
+        // Kalau lolos verifikasi → proses payload
         $data = $request->all();
 
         $zone = $data['data']['target_zone_name'] ?? '-';
@@ -78,7 +78,7 @@ Traffic: {$rate} rps
 ";
 
         // info($msg);
-        (new WagoService())->sendMessageGroup($this->groupId, $msg);
+        (new WagoService)->sendMessageGroup($this->groupId, $msg);
 
         return response()->json(['status' => 'ok']);
     }
@@ -91,7 +91,7 @@ Traffic: {$rate} rps
             return $auth; // balikan response unauthorized
         }
 
-        // Kalau lolos verifikasi → proses payload        
+        // Kalau lolos verifikasi → proses payload
         $data = $request->all();
 
         $severity = strtoupper($data['data']['severity'] ?? 'INFO');
@@ -119,7 +119,7 @@ Status: ❌ Unreachable (≥ 5 menit)
 ";
 
         // info($msg);
-        (new WagoService())->sendMessageGroup($this->groupId, $msg);
+        (new WagoService)->sendMessageGroup($this->groupId, $msg);
 
         return response()->json(['status' => 'ok']);
     }
@@ -177,7 +177,7 @@ Availability: {$base}% ➝ {$curr}%
             return response()->json(['status' => 'ignored']);
         }
 
-        (new WagoService())->sendMessageGroup($this->groupId, $msg);
+        (new WagoService)->sendMessageGroup($this->groupId, $msg);
 
         return response()->json(['status' => 'ok']);
     }

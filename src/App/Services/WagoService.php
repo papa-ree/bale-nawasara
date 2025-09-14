@@ -13,7 +13,7 @@ class WagoService
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
             ])
-            ->post(env('WHATSAPP_GO_URL') . '/send/message', [
+            ->post(env('WHATSAPP_GO_URL').'/send/message', [
                 'phone' => "{$phone}@s.whatsapp.net",
                 'message' => $message,
             ]);

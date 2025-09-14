@@ -14,7 +14,9 @@ class SendWagoMessageJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected string $phone;
+
     protected string $message;
+
     protected ?string $replyMessageId;
 
     public function __construct(string $phone, string $message, ?string $replyMessageId = null)
@@ -26,6 +28,6 @@ class SendWagoMessageJob implements ShouldQueue
 
     public function handle(): void
     {
-        (new WagoService())->sendMessage($this->phone, $this->message, $this->replyMessageId);
+        (new WagoService)->sendMessage($this->phone, $this->message, $this->replyMessageId);
     }
 }
