@@ -4,8 +4,10 @@ namespace Paparee\BaleNawasara\App\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
+use Paparee\BaleNawasara\App\Jobs\SendWagoMessageJob;
+use Paparee\BaleNawasara\App\Services\WagoService;
 
 class WagoController extends Controller
 {
@@ -26,16 +28,29 @@ class WagoController extends Controller
         }
 
         try {
-            $response = Http::withBasicAuth(env('WHATSAPP_GO_USER'), env('WHATSAPP_GO_PASSWORD'))
-                ->withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post(env('WHATSAPP_GO_URL').'/send/message', [
-                    'phone' => $request->phone.'@s.whatsapp.net',
-                    'message' => $request->message,
-                    'reply_message_id' => $request->reply_message_id,
-                ]);
+            $key = 'wago-send-message:' . $request->ip();
+            $limit = 10;
+
+            // cek rate limiter
+            if (RateLimiter::tooManyAttempts($key, $limit)) {
+                // masuk ke job antrian
+                SendWagoMessageJob::dispatch(
+                    $request->phone,
+                    $request->message,
+                    $request->reply_message_id
+                );
+
+                return response()->json([
+                    'code' => 202,
+                    'message' => 'Queued. Too many requests, message will be sent via background job.',
+                    'results' => (object) [],
+                ], 202);
+            }
+
+            RateLimiter::hit($key, 60); // reset setiap 60 detik
+
+            // langsung kirim
+            $response = (new WagoService())->sendMessage($request->phone, $request->message, $request->reply_message_id);
 
             if ($response->successful()) {
                 return response()->json([
@@ -43,19 +58,19 @@ class WagoController extends Controller
                     'message' => 'Success',
                     'results' => [
                         'message_id' => $response['message_id'] ?? '',
-                        'status' => $response['status'] ?? '<feature> success ....',
+                        'status' => $response['status'] ?? 'Message Delivered',
                     ],
                 ]);
             }
 
             return response()->json([
                 'code' => $response->status(),
-                'message' => $response->json('message') ?? $response->status() == 401 ? 'Unauthorized, Please contact Administrator' : 'Unknown error',
+                'message' => $response->json('message') ?? ($response->status() == 401 ? 'Unauthorized, Please contact Administrator' : 'Unknown error'),
                 'results' => (object) [],
             ], $response->status());
 
         } catch (\Exception $e) {
-            info('Wago Error message: ', $e->getMessage());
+            info('Wago Error message: ' . $e->getMessage());
 
             return response()->json([
                 'code' => 500,
@@ -64,4 +79,5 @@ class WagoController extends Controller
             ], 500);
         }
     }
+
 }

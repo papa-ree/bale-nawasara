@@ -5,7 +5,7 @@ namespace Paparee\BaleNawasara\App\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class WebhookController extends Controller
+class WagoWebhookController extends Controller
 {
     public function handle(Request $request)
     {
@@ -14,14 +14,14 @@ class WebhookController extends Controller
         $payload = $request->getContent(); // Ambil raw payload
         $signatureHeader = $request->header('X-Hub-Signature-256');
 
-        if (! $signatureHeader) {
+        if (!$signatureHeader) {
             return response()->json(['error' => 'Missing signature'], 400);
         }
 
         // HMAC SHA256
-        $expectedSignature = 'sha256='.hash_hmac('sha256', $payload, $secret);
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
 
-        if (! hash_equals($expectedSignature, $signatureHeader)) {
+        if (!hash_equals($expectedSignature, $signatureHeader)) {
             logger()->warning('Webhook signature mismatch', [
                 'expected' => $expectedSignature,
                 'got' => $signatureHeader,
