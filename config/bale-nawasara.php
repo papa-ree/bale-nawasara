@@ -31,4 +31,10 @@ return [
         'token' => env('KUMA_PROXY_TOKEN'),
     ],
 
+    'notification' => [
+        'quiet_hours' => [
+            'start' => env('NOTIFICATION_QUIET_START', '21:00'), // mulai jam tenang
+            'end' => env('NOTIFICATION_QUIET_END', '07:00'),  // selesai jam tenang
+        ],
+    ],
 ];

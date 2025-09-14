@@ -101,9 +101,29 @@ _Status:_ ✅ *UP*"
             if (isset($msg)) {
                 (new WagoService())->sendMessageGroup("120363402020043689", $msg);
             }
+
+            // if (!$this->isQuietHours()) {
+
+            // }
         }
 
         return response()->json(['status' => 'ok']);
+    }
+
+    protected function isQuietHours(): bool
+    {
+        $start = config('bale-nawasara.notification.quiet_hours.start');
+        $end = config('bale-nawasara.notification.quiet_hours.end');
+
+        $now = now()->format('H:i');
+
+        if ($start < $end) {
+            // Kasus normal: contoh 21:00 - 23:00
+            return $now >= $start && $now < $end;
+        } else {
+            // Kasus melewati tengah malam: contoh 21:00 - 07:00
+            return $now >= $start || $now < $end;
+        }
     }
 
     // array (
