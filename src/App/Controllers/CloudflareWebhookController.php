@@ -181,4 +181,45 @@ Availability: {$base}% ➝ {$curr}%
 
         return response()->json(['status' => 'ok']);
     }
+
+    public function healthCheckHandle(Request $request)
+    {
+        // 🔒 Otentikasi global (bisa dipakai semua handler)
+        $secret = config('services.cloudflare.webhook_secret', env('CLOUDFLARE_WEBHOOK_SECRET'));
+        if ($request->header('cf-webhook-auth') !== $secret) {
+            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $payload = $request->all();
+        $data = $payload['data'] ?? [];
+
+        $time = isset($payload['ts'])
+            ? Carbon::createFromTimestamp($payload['ts'])->timezone('Asia/Jakarta')->format('d-m-Y H:i:s')
+            : '-';
+
+        $severity = strtoupper($data['severity'] ?? 'INFO');
+        $status = $data['status'] ?? '-';
+        $reason = $data['reason'] ?? '-';
+        $event = $data['state_event'] ?? '-';
+        $name = $data['name'] ?? '-';
+        $policy = $payload['policy_name'] ?? '-';
+
+        // 📌 Format pesan ringkas & detail
+        $msg = "🚨 [{$severity}] Health Check Alert
+
+🔹 Name : {$name}
+🔹 Status : {$status}
+🔹 Reason : {$reason}
+🔹 Time : {$time}
+
+Detail:
+- Event : {$event}
+- Policy : {$policy}";
+
+        (new WagoService)->sendMessageGroup($this->groupId, $msg);
+
+        return response()->json(['status' => 'ok']);
+    }
+
+
 }
