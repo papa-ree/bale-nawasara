@@ -207,10 +207,10 @@ Availability: {$base}% ➝ {$curr}%
         // 📌 Format pesan ringkas & detail
         $msg = "🚨 [{$severity}] Health Check Alert
 
-🔹 Name : {$name}
-🔹 Status : {$status}
-🔹 Reason : {$reason}
-🔹 Time : {$time}
+Name : {$name}
+Status : {$status}
+Reason : {$reason}
+Time : {$time}
 
 Detail:
 - Event : {$event}
