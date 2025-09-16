@@ -184,10 +184,10 @@ Availability: {$base}% ➝ {$curr}%
 
     public function healthCheckHandle(Request $request)
     {
-        // 🔒 Otentikasi global (bisa dipakai semua handler)
-        $secret = config('services.cloudflare.webhook_secret', env('CLOUDFLARE_WEBHOOK_SECRET'));
-        if ($request->header('cf-webhook-auth') !== $secret) {
-            return response()->json(['error' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        // 🔐 Verifikasi otentikasi
+        $auth = $this->verifyCloudflareWebhook($request);
+        if ($auth !== true) {
+            return $auth; // balikan response unauthorized
         }
 
         $payload = $request->all();
