@@ -220,6 +220,4 @@ Detail:
 
         return response()->json(['status' => 'ok']);
     }
-
-
 }
