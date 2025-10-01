@@ -28,7 +28,7 @@ class WagoController extends Controller
         }
 
         try {
-            $key = 'wago-send-message:'.$request->ip();
+            $key = 'wago-send-message:' . $request->ip();
             $limit = 10;
 
             // cek rate limiter
@@ -70,7 +70,7 @@ class WagoController extends Controller
             ], $response->status());
 
         } catch (\Exception $e) {
-            info('Wago Error message: '.$e->getMessage());
+            info('Wago Error message: ' . $e->getMessage());
 
             return response()->json([
                 'code' => 500,
@@ -78,5 +78,38 @@ class WagoController extends Controller
                 'results' => (object) [],
             ], 500);
         }
+    }
+
+    public function userCheck(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'code' => 400,
+                'message' => 'Validation fails',
+                'results' => (object) [],
+            ], 400);
+        }
+
+        $response = (new WagoService)->userCheck($request->phone);
+
+        if ($response->successful()) {
+            return response()->json([
+                'code' => 200,
+                'message' => 'Success check user',
+                'results' => [
+                    'is_on_whatsapp' => $response['results']['is_on_whatsapp'],
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'code' => $response->status(),
+            'message' => $response->json('message') ?? ($response->status() == 401 ? 'Unauthorized, Please contact Administrator' : 'Unknown error'),
+            'results' => (object) [],
+        ], $response->status());
     }
 }
