@@ -28,7 +28,7 @@ class WagoController extends Controller
         }
 
         try {
-            $key = 'wago-send-message:' . $request->ip();
+            $key = 'wago-send-message:'.$request->ip();
             $limit = 10;
 
             // cek rate limiter
@@ -70,7 +70,7 @@ class WagoController extends Controller
             ], $response->status());
 
         } catch (\Exception $e) {
-            info('Wago Error message: ' . $e->getMessage());
+            info('Wago Error message: '.$e->getMessage());
 
             return response()->json([
                 'code' => 500,
