@@ -17,7 +17,7 @@ class MigrationsCommand extends Command
     {
         $this->info('Running Nawasara migrations...');
 
-        $migrationPath = __DIR__ . '/../../database/migrations';
+        $migrationPath = __DIR__.'/../../database/migrations';
 
         // pastikan relative path dari base_path
         $relativePath = ltrim(str_replace(base_path(), '', realpath($migrationPath)), DIRECTORY_SEPARATOR);
@@ -30,6 +30,7 @@ class MigrationsCommand extends Command
         $this->line(Artisan::output());
 
         $this->info('Nawasara migrations finished.');
+
         return self::SUCCESS;
     }
 }

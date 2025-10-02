@@ -8,12 +8,11 @@ use Paparee\BaleNawasara\App\Traits\GeneratesTicketNumber;
 
 class HelpdeskForm extends Model
 {
-    use HasUuids;
     use GeneratesTicketNumber;
+    use HasUuids;
 
     // Atur prefix khusus untuk model ini
     protected string $ticketPrefix = 'ADU';
 
     protected $guarded = ['id'];
-
 }

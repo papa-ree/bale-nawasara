@@ -24,7 +24,7 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/bale-nawasara.php', 'bale-nawasara');
+        $this->mergeConfigFrom(__DIR__.'/../config/bale-nawasara.php', 'bale-nawasara');
 
         $commands = [
             'command.nawasara:sync-dns-record' => SyncDnsRecord::class,
@@ -56,17 +56,17 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 
         // Config publish
         $this->publishes([
-            __DIR__ . '/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
-            __DIR__ . '/../config/routeros-api.php' => config_path('routeros-api.php'),
-            __DIR__ . '/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
+            __DIR__.'/../config/bale-nawasara.php' => config_path('bale-nawasara.php'),
+            __DIR__.'/../config/routeros-api.php' => config_path('routeros-api.php'),
+            __DIR__.'/../config/uptime-monitor.php' => config_path('uptime-monitor.php'),
         ], 'bale-nawasara-config');
 
         $this->publishes([
-            __DIR__ . '/../resources/views/livewire' => resource_path('views/livewire'),
+            __DIR__.'/../resources/views/livewire' => resource_path('views/livewire'),
         ], 'bale-nawasara-views');
 
         $this->publishes([
-            __DIR__ . '/../resources/css' => resource_path('css'),
+            __DIR__.'/../resources/css' => resource_path('css'),
         ], 'bale-nawasara-assets');
 
         $this->registerLivewireComponents();
@@ -77,20 +77,20 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
 
     protected function loadMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     protected function registerLivewireComponents(): void
     {
-        $namespace = "Paparee\\BaleNawasara\\Livewire\\Pages\\";
-        $basePath = __DIR__ . "/Livewire";
+        $namespace = 'Paparee\\BaleNawasara\\Livewire\\Pages\\';
+        $basePath = __DIR__.'/Livewire';
 
         // Jika folder Livewire tidak ada, hentikan proses
-        if (!is_dir($basePath)) {
+        if (! is_dir($basePath)) {
             return;
         }
 
-        $finder = new Finder();
+        $finder = new Finder;
         $finder->files()->in($basePath)->name('*.php');
 
         foreach ($finder as $file) {
@@ -100,24 +100,24 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
             $nsPath = str_replace(['/', '\\'], '\\', $relativePathname);
 
             // Konversi ke FQCN (Fully Qualified Class Name)
-            $class = $namespace . '\\' . Str::beforeLast($nsPath, '.php');
+            $class = $namespace.'\\'.Str::beforeLast($nsPath, '.php');
 
             // Skip jika class tidak ditemukan
-            if (!class_exists($class)) {
+            if (! class_exists($class)) {
                 continue;
             }
 
             // Skip jika bukan turunan Livewire\Component
-            if (!is_subclass_of($class, Component::class)) {
+            if (! is_subclass_of($class, Component::class)) {
                 continue;
             }
 
             // Buat alias berdasarkan struktur folder (kebab-case)
             $withoutExt = Str::replaceLast('.php', '', $relativePathname);
             $segments = preg_split('#[\\/\\\\]#', $withoutExt);
-            $kebab = array_map(fn($s) => Str::kebab($s), $segments);
+            $kebab = array_map(fn ($s) => Str::kebab($s), $segments);
 
-            $alias = 'nawasara.' . implode('.', $kebab);
+            $alias = 'nawasara.'.implode('.', $kebab);
 
             // Registrasi komponen ke Livewire
             Livewire::component($alias, $class);
@@ -127,7 +127,7 @@ class BaleNawasaraServiceProvider extends PackageServiceProvider
     protected function registerViews(): void
     {
         $this->loadViewsFrom(
-            __DIR__ . '/../resources/views',
+            __DIR__.'/../resources/views',
             'nawasara'
         );
     }
