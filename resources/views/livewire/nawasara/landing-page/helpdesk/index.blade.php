@@ -93,10 +93,8 @@ _{$this->description}_
 
 *Waktu* : {$time}";
 
-                $aduanGroupId = "120363422711216219";
-
                 //debug group
-                (new WagoService)->sendMessageGroup('120363403973800965', $msg);
+                (new WagoService)->sendMessageGroup(env('ADUAN_GROUP_ID'), $msg);
 
                 DB::commit();
                 $this->sended = true;
