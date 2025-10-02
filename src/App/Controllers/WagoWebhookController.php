@@ -9,9 +9,6 @@ use Paparee\BaleNawasara\App\Services\WagoService;
 
 class WagoWebhookController extends Controller
 {
-
-    public $aduanGroupId = env('ADUAN_GROUP_ID');
-
     public function handle(Request $request)
     {
         $secret = config('bale-nawasara.whatsapp.secret');
@@ -59,7 +56,7 @@ class WagoWebhookController extends Controller
         }
 
         // Group yang diizinkan
-        $allowedGroupId = $this->aduanGroupId;
+        $allowedGroupId = env('ADUAN_GROUP_ID');
 
         // Cek apakah From mengandung group id yang diizinkan
         if ($chatId == $allowedGroupId) {
