@@ -96,7 +96,7 @@ Terima kasih kak
                 $client_msg = "*Aduan telah dikonfirmasi petugas*
 *No. Tiket* : {$item->ticket_number}";
 
-                //send to client
+                // send to client
                 (new WagoService)->sendMessage($item->phone, $client_msg);
             }
 
