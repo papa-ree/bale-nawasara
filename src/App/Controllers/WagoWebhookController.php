@@ -60,14 +60,15 @@ class WagoWebhookController extends Controller
 
         // Cek apakah From mengandung group id yang diizinkan
         if ($chatId == $allowedGroupId) {
-            // $messageData = json_decode($message, true);
 
             $unassign_ticket = HelpdeskForm::wherePic(null)->count();
 
             $item = HelpdeskForm::whereTicketNumber($ticketNumber)->first();
 
+            // cek apakah sudah memiliki PIC
             if ($item->pic) {
 
+                // pesan jika sudah memiiliki PIC namun
                 $msg = " ℹ️ *Aduan sedang ditangani* 
 *Petugas:* {$item->pic}  
 *Waktu:* {$item->updated_at}  
@@ -76,6 +77,7 @@ Aduan yang belum terkonfirmasi:  {$unassign_ticket}
 ";
 
             } else {
+                // jika PIC masih kosong
                 $item->update([
                     'pic' => $pushname,
                     'message_id' => $replied_id,
@@ -90,15 +92,21 @@ Aduan yang belum terkonfirmasi:  {$unassign_ticket}
 Aduan yang belum terkonfirmasi:  {$new}  
 Terima kasih kak   
 ";
+
+                $client_msg = "*Aduan telah dikonfirmasi petugas*
+*No. Tiket* : {$item->ticket_number}";
+
+                //send to client
+                (new WagoService)->sendMessage($item->phone, $client_msg);
             }
 
             (new WagoService)->sendMessageGroup($allowedGroupId, $msg);
 
-            // logger()->info('Payload disimpan ke HelpdeskForm', [
-            //     'ticket_number' => $ticketNumber,
-            //     'replied_id' => $replied_id,
-            //     'pushname' => $pushname,
-            // ]);
+            logger()->info('Payload disimpan ke HelpdeskForm', [
+                'ticket_number' => $ticketNumber,
+                'replied_id' => $replied_id,
+                'pushname' => $pushname,
+            ]);
             // } else {
             //     logger()->info('Payload diabaikan karena bukan grup terdaftar', [
             //         'from' => $from,

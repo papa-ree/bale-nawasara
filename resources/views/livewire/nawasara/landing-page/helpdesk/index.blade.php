@@ -93,8 +93,21 @@ _{$this->description}_
 
 *Waktu* : {$time}";
 
-                //debug group
+                //send to aduan group
                 (new WagoService)->sendMessageGroup(env('ADUAN_GROUP_ID'), $msg);
+
+                $client_msg = "*Aduan anda telah tercatat*
+*No. Tiket* : {$form->ticket_number}
+*Pelapor* : {$this->name}
+*NIP* : {$this->nip}
+*Isi Aduan* :
+_{$this->description}_
+
+Aduan anda akan ditindaklanjuti petugas kami.
+Terima kasih.";
+
+                //send to client
+                (new WagoService)->sendMessage($convert_phone, $client_msg);
 
                 DB::commit();
                 $this->sended = true;
