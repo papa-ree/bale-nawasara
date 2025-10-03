@@ -19,15 +19,15 @@ class WagoWebhookController extends Controller
         // Ambil header signature
         $signatureHeader = $request->header('X-Hub-Signature-256');
 
-        if (!$signatureHeader) {
+        if (! $signatureHeader) {
             return response()->json(['error' => 'Missing signature'], 400);
         }
 
         // Generate signature dengan HMAC SHA256
-        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
+        $expectedSignature = 'sha256='.hash_hmac('sha256', $payload, $secret);
 
         // Validasi signature
-        if (!hash_equals($expectedSignature, $signatureHeader)) {
+        if (! hash_equals($expectedSignature, $signatureHeader)) {
             logger()->warning('Webhook signature mismatch', [
                 'expected' => $expectedSignature,
                 'got' => $signatureHeader,
@@ -40,7 +40,7 @@ class WagoWebhookController extends Controller
         // Decode payload menjadi array
         $data = json_decode($payload, true);
 
-        if (!$data) {
+        if (! $data) {
             return response()->json(['error' => 'Invalid JSON'], 400);
         }
 
@@ -52,7 +52,7 @@ class WagoWebhookController extends Controller
         $quotedMessage = $data['message']['quoted_message'] ?? null; // JSON string
 
         if (preg_match('/#([A-Z]+-\d{8}-\d{3})/', $quotedMessage, $matches)) {
-            $ticketNumber = '#' . $matches[1];
+            $ticketNumber = '#'.$matches[1];
         }
 
         // Group yang diizinkan
