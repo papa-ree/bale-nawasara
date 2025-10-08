@@ -17,7 +17,6 @@ new class extends Component {
     public $status;
 
     #[On('setData')]
-    #[Computed()]
     public function getTicketData($ticketId)
     {
         $this->ticket = HelpdeskForm::find($ticketId);
@@ -117,17 +116,12 @@ new class extends Component {
 
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">PIC</p>
-                <p class="font-semibold text-gray-800 dark:text-white">{{$pic}}</p>
+                <p class="font-semibold text-gray-800 dark:text-white">{{$pic ?? '-'}}</p>
             </div>
-
-            {{-- <div>
-                <p class="text-sm text-gray-500 dark:text-gray-400">PIC</p>
-                <p class="font-semibold text-gray-800 dark:text-white" x-text="pic"></p>
-            </div> --}}
 
             <div>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
-                <p class="font-semibold text-gray-800 dark:text-white">{{$status}}</p>
+                <p class="font-semibold text-gray-800 dark:text-white">{{$status ?? 'loading'}}</p>
             </div>
 
         </div>
@@ -136,14 +130,15 @@ new class extends Component {
             @if ($pic)
                 <a :href="`https://wa.me/` + phone" target="_blank" link label="Go to Whatsapp" type="button"
                     wire:loading.remove
+                    wire:click="$dispatch('closeBaleModal', { id: 'helpdeskDetailModal' }); $wire.resetVal()"
                     class="flex items-center px-4 py-3 ml-3 text-sm antialiased tracking-wide text-center text-white capitalize transition-all duration-500 border border-blue-300 rounded-lg select-none dark:border-blue-300/70 bg-gradient-to-tl from-emerald-300 via-blue-500 to-teal-500 bg-size-200 bg-pos-0 hover:bg-pos-100" />
                 Go to Whatsapp
                 </a>
             @else
                 <x-bale.button label="Assign" type="submit" class="ml-3" wire:loading.remove />
             @endif
-            <x-bale.secondary-button label="Cancel" type="button"
-                wire:click="$dispatch('closeBaleModal', { id: 'helpdeskDetailModal' }); $wire.resetVal()" />
+            <x-bale.secondary-button label="Cancel" type="button" disabled
+                wire:click="$dispatch('closeBaleModal', { id: 'helpdeskDetailModal' }); $wire.resetVal(); $dispatch('refresh-ticket-list')" />
         </x-bale.modal-action>
 
     </form>
