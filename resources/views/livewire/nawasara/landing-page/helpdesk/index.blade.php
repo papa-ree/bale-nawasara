@@ -22,6 +22,13 @@ new
 
     public $sended = false;
 
+    public $enabledWago = false;
+
+    public function mount()
+    {
+        $this->enabledWago = env('ENABLE_WAGO');
+    }
+
     protected function rules()
     {
         return [
@@ -78,11 +85,14 @@ new
                     'nip' => $this->nip,
                     'phone' => $convert_phone,
                     'description' => $this->description,
+                    'status' => 'open',
                 ]);
 
-                $time = date('d-m-Y H:i:s');
+                if ($this->enabledWago) {
 
-                $msg = "📢 *Aduan Baru Masuk*
+                    $time = date('d-m-Y H:i:s');
+
+                    $msg = "📢 *Aduan Baru Masuk*
 *No. Tiket* : {$form->ticket_number}
 
 *Pelapor* : {$this->name}
@@ -93,10 +103,10 @@ _{$this->description}_
 
 *Waktu* : {$time}";
 
-                //send to aduan group
-                (new WagoService)->sendMessageGroup(env('ADUAN_GROUP_ID'), $msg);
+                    //send to aduan group
+                    (new WagoService)->sendMessageGroup(env('ADUAN_GROUP_ID'), $msg);
 
-                $client_msg = "*Aduan anda telah tercatat*
+                    $client_msg = "*Aduan anda telah tercatat*
 *No. Tiket* : {$form->ticket_number}
 *Pelapor* : {$this->name}
 *NIP* : {$this->nip}
@@ -106,8 +116,9 @@ _{$this->description}_
 Aduan anda akan ditindaklanjuti petugas kami.
 Terima kasih.";
 
-                //send to client
-                (new WagoService)->sendMessage($convert_phone, $client_msg);
+                    //send to client
+                    (new WagoService)->sendMessage($convert_phone, $client_msg);
+                }
 
                 DB::commit();
                 $this->sended = true;
@@ -152,18 +163,13 @@ Terima kasih.";
 
     protected function userPhoneCheck($convert_phone)
     {
-        $response = (new WagoService())->userCheck($convert_phone);
-        if ($response->successful()) {
-            //return response()->json([
-            //    'code' => 200,
-            //    'message' => 'Success',
-            //    'results' => [
-            //        'message_id' => $response['message_id'] ?? '',
-            //        'status' => $response['status'] ?? 'Message Delivered',
-            //    ],
-            //]);
-            //dd($response['results']['is_on_whatsapp'], $convert_phone);
-            return $response['results']['is_on_whatsapp'];
+        if ($this->enabledWago) {
+            $response = (new WagoService())->userCheck($convert_phone);
+            if ($response->successful()) {
+                return $response['results']['is_on_whatsapp'];
+            }
+        } else {
+            return true;
         }
 
     }
@@ -172,12 +178,11 @@ Terima kasih.";
 
 <div>
     <div class="flex items-center justify-center min-h-full px-4 pt-5 sm:px-6 lg:px-8" wire:cloak>
-        <!-- Theme Toggle -->
-        {{-- <x-bale-cms::dark-mode-toggle /> --}}
+        {{-- <!-- Theme Toggle --> --}}
+
         <div class="absolute p-0.5 rounded-full bg-emerald-300 right-3 top-3">
             <x-bale.dark-mode-toggle />
         </div>
-
 
         <div class="w-full max-w-lg space-y-8" x-data="{isSend: $wire.entangle('sended').live, disabledButton: false}">
             {{-- <!-- Header --> --}}
